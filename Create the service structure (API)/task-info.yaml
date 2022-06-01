@@ -293,9 +293,9 @@ files:
 - name: src/account/exceptions/UserNotAllowed.java
   visible: true
   learner_created: true
-feedback_link: https://hyperskill.org/projects/217/stages/1086/implement#comment
+feedback_link: https://hyperskill.org/learn/step/16601#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: Mon, 30 May 2022 10:30:13 UTC
-record: -1
+record: 1
