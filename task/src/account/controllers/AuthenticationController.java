@@ -22,6 +22,6 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public EmployeeResponse registerUser(@Valid @RequestBody Employee employee) {
-        return employeeService.addEnployee(employee);
+        return employeeService.addEmployee(employee);
     }
 }

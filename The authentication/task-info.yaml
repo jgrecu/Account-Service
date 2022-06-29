@@ -573,6 +573,36 @@ files:
         }
     }
   learner_created: true
+- name: src/account/security/SecurityConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/security/RestAuthenticationEntryPoint.java
+  visible: true
+  learner_created: true
+- name: src/account/model/User.java
+  visible: true
+  learner_created: true
+- name: src/account/respository/UserRepository.java
+  visible: true
+  learner_created: true
+- name: src/account/service/UserService.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/UserExistsException.java
+  visible: true
+  learner_created: true
+- name: src/account/controllers/EmployeeController.java
+  visible: true
+  learner_created: true
+- name: src/account/security/PasswordEncoderConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/security/Role.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16602#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 29 Jun 2022 13:49:29 UTC
 record: -1
