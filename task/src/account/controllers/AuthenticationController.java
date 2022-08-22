@@ -1,27 +1,35 @@
 package account.controllers;
 
-import account.model.Employee;
-import account.responses.EmployeeResponse;
-import account.service.EmployeeService;
+import account.model.ChangePassRequest;
+import account.model.UserDTO;
+import account.responses.ChangePassResponse;
+import account.responses.UserResponse;
+import account.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    private final EmployeeService employeeService;
+    private final UserService userService;
 
-    public AuthenticationController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public AuthenticationController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/signup")
-    public EmployeeResponse registerUser(@Valid @RequestBody Employee employee) {
-        return employeeService.addEmployee(employee);
+    public UserResponse registerUser(@Valid @RequestBody UserDTO userDTO) {
+        return userService.addEmployee(userDTO);
+    }
+
+    @PostMapping("/changepass")
+    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassRequest passRequest) {
+        return userService.updatePassword(principal.getName(), passRequest.getNewPassword());
     }
 }

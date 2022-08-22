@@ -367,6 +367,79 @@ files:
       };
     }
   learner_created: false
+- name: src/account/controllers/AuthenticationController.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.model.Employee;
+    import account.responses.EmployeeResponse;
+    import account.service.EmployeeService;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import javax.validation.Valid;
+
+    @RestController
+    @RequestMapping("/api/auth")
+    public class AuthenticationController {
+
+        private final EmployeeService employeeService;
+
+        public AuthenticationController(EmployeeService employeeService) {
+            this.employeeService = employeeService;
+        }
+
+        @PostMapping("/signup")
+        public EmployeeResponse registerUser(@Valid @RequestBody Employee employee) {
+            return employeeService.addEnployee(employee);
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/UserNotAllowed.java
+  visible: true
+  text: |
+    package account.exceptions;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public class UserNotAllowed extends RuntimeException {
+        public UserNotAllowed(String message) {
+            super(message);
+        }
+    }
+  learner_created: true
+- name: src/account/security/SecurityConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/security/RestAuthenticationEntryPoint.java
+  visible: true
+  learner_created: true
+- name: src/account/model/User.java
+  visible: true
+  learner_created: true
+- name: src/account/respository/UserRepository.java
+  visible: true
+  learner_created: true
+- name: src/account/service/UserService.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/UserExistsException.java
+  visible: true
+  learner_created: true
+- name: src/account/controllers/EmployeeController.java
+  visible: true
+  learner_created: true
+- name: src/account/security/PasswordEncoderConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/security/Role.java
+  visible: true
+  learner_created: true
 - name: src/account/model/Employee.java
   visible: true
   text: |
@@ -435,37 +508,6 @@ files:
                     ", email='" + email + '\'' +
                     ", password='" + password + '\'' +
                     '}';
-        }
-    }
-  learner_created: true
-- name: src/account/controllers/AuthenticationController.java
-  visible: true
-  text: |
-    package account.controllers;
-
-    import account.model.Employee;
-    import account.responses.EmployeeResponse;
-    import account.service.EmployeeService;
-    import org.springframework.web.bind.annotation.PostMapping;
-    import org.springframework.web.bind.annotation.RequestBody;
-    import org.springframework.web.bind.annotation.RequestMapping;
-    import org.springframework.web.bind.annotation.RestController;
-
-    import javax.validation.Valid;
-
-    @RestController
-    @RequestMapping("/api/auth")
-    public class AuthenticationController {
-
-        private final EmployeeService employeeService;
-
-        public AuthenticationController(EmployeeService employeeService) {
-            this.employeeService = employeeService;
-        }
-
-        @PostMapping("/signup")
-        public EmployeeResponse registerUser(@Valid @RequestBody Employee employee) {
-            return employeeService.addEnployee(employee);
         }
     }
   learner_created: true
@@ -558,51 +600,9 @@ files:
         }
     }
   learner_created: true
-- name: src/account/exceptions/UserNotAllowed.java
-  visible: true
-  text: |
-    package account.exceptions;
-
-    import org.springframework.http.HttpStatus;
-    import org.springframework.web.bind.annotation.ResponseStatus;
-
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public class UserNotAllowed extends RuntimeException {
-        public UserNotAllowed(String message) {
-            super(message);
-        }
-    }
-  learner_created: true
-- name: src/account/security/SecurityConfig.java
-  visible: true
-  learner_created: true
-- name: src/account/security/RestAuthenticationEntryPoint.java
-  visible: true
-  learner_created: true
-- name: src/account/model/User.java
-  visible: true
-  learner_created: true
-- name: src/account/respository/UserRepository.java
-  visible: true
-  learner_created: true
-- name: src/account/service/UserService.java
-  visible: true
-  learner_created: true
-- name: src/account/exceptions/UserExistsException.java
-  visible: true
-  learner_created: true
-- name: src/account/controllers/EmployeeController.java
-  visible: true
-  learner_created: true
-- name: src/account/security/PasswordEncoderConfig.java
-  visible: true
-  learner_created: true
-- name: src/account/security/Role.java
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16602#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: Wed, 29 Jun 2022 13:49:29 UTC
-record: -1
+record: 2

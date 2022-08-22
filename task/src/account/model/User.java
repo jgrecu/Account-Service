@@ -37,12 +37,12 @@ public class User implements UserDetails {
         this.enabled = true;
     }
 
-    public User(Employee employee, String password, Role role) {
+    public User(UserDTO userDTO, String password, Role role) {
         this.password = password;
-        this.name = employee.getName();
-        this.lastname = employee.getLastname();
-        this.email = employee.getEmail();
-        this.username = employee.getEmail();
+        this.name = userDTO.getName();
+        this.lastname = userDTO.getLastname();
+        this.email = userDTO.getEmail();
+        this.username = userDTO.getEmail();
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;

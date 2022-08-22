@@ -1,7 +1,7 @@
 package account.controllers;
 
-import account.responses.EmployeeResponse;
-import account.service.EmployeeService;
+import account.responses.UserResponse;
+import account.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,16 +12,16 @@ import java.security.Principal;
 @RequestMapping("/api/empl")
 public class EmployeeController {
 
-    private final EmployeeService employeeService;
+    private final UserService userService;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/payment")
-    public EmployeeResponse getEmployee(Principal principal) {
+    public UserResponse getEmployee(Principal principal) {
         String name = principal.getName();
 
-        return employeeService.getEmployee(name);
+        return userService.getUser(name);
     }
 }

@@ -42,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/changepass").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name(), Role.ADMINISTRATOR.name())
                 .antMatchers(HttpMethod.GET, "/api/empl/payment").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name())
                 .and()
                 .sessionManagement()

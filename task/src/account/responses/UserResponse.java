@@ -2,20 +2,20 @@ package account.responses;
 
 import account.model.User;
 
-public class EmployeeResponse {
+public class UserResponse {
     private Long id;
     private String name;
     private String lastname;
     private String email;
 
-    public EmployeeResponse(Long id, String name, String lastname, String email) {
+    public UserResponse(Long id, String name, String lastname, String email) {
         this.id = id;
         this.name = name;
         this.lastname = lastname;
         this.email = email;
     }
 
-    public EmployeeResponse(User user) {
+    public UserResponse(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.lastname = user.getLastname();

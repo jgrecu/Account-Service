@@ -1,8 +1,14 @@
 package account.model;
 
-import javax.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Employee {
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+public class UserDTO {
 
     @NotBlank
     private String name;
@@ -13,14 +19,23 @@ public class Employee {
     @NotBlank
     private String password;
 
-    public Employee() {
+    private List<String> roles;
+
+    public UserDTO() {
     }
 
-    public Employee(String name, String lastname, String email, String password) {
+    public UserDTO(String name, String lastname, String email, String password) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
+    }
+
+    public UserDTO(String name, String lastname, String email, List<String> roles) {
+        this.name = name;
+        this.lastname = lastname;
+        this.email = email;
+        this.roles = roles;
     }
 
     public String getName() {
@@ -47,6 +62,8 @@ public class Employee {
         this.email = email;
     }
 
+    @JsonIgnore
+    @JsonProperty(value = "password")
     public String getPassword() {
         return password;
     }
