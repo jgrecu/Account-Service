@@ -1,18 +1,18 @@
 <html><body><h5 id="description">Description</h5>
-<p>It's time to start with the business functions of our application! We remind you that our service must provide users with information about the userDTO's salary for the selected period. Also, our service should allow the accountant to upload information about the salary of employees. Take another look at the endpoints:</p>
+<p>It's time to start with the business functions of our application! We remind you that our service must provide users with information about the employee's salary for the selected period. Also, our service should allow the accountant to upload information about the salary of employees. Take another look at the endpoints:</p>
 <ol>
 <li><code class="language-json">POST api/acct/payments</code> uploads payrolls;</li>
 <li><code class="language-json">PUT api/acct/payments</code> changes the salary of a specific user;</li>
-<li><code class="language-json">GET api/empl/payment</code> gives access to the payroll of an userDTO.</li>
+<li><code class="language-json">GET api/empl/payment</code> gives access to the payroll of an employee.</li>
 </ol>
 <p>Information about the salary of employees is transmitted as an array of JSON objects. This operation must be transactional. That is, if an error occurs during an update, perform a rollback to the original state. The following requirements are imposed on the data:</p>
 <ul>
-<li>An userDTO must be among the users of our service;</li>
-<li>The period for which the salary is paid must be unique for each userDTO (for <code class="language-json">POST</code>),</li>
+<li>An employee must be among the users of our service;</li>
+<li>The period for which the salary is paid must be unique for each employee (for <code class="language-json">POST</code>),</li>
 <li>Salary is calculated in cents and cannot be negative.</li>
 </ul>
-<p>Changing the salary must be done in a separate corrective operation, <code class="language-json">PUT</code>. The previous data requirements remain, except for the uniqueness requirement. In this stage, we are not concerned with an userDTO-period pair.</p>
-<p>Salary information is provided to an userDTO upon successful authentication on the corresponding endpoint, while the request specifies the period for which the information should be provided. If the period is not specified, provide all available information in the form of an array of JSON objects. For convenience, convert the salary to <code class="language-json">X dollar(s) Y cent(s)</code>.</p>
+<p>Changing the salary must be done in a separate corrective operation, <code class="language-json">PUT</code>. The previous data requirements remain, except for the uniqueness requirement. In this stage, we are not concerned with an employee-period pair.</p>
+<p>Salary information is provided to an employee upon successful authentication on the corresponding endpoint, while the request specifies the period for which the information should be provided. If the period is not specified, provide all available information in the form of an array of JSON objects. For convenience, convert the salary to <code class="language-json">X dollar(s) Y cent(s)</code>.</p>
 <p><button class="btn-sm btn-outline-secondary" onclick="getElementById('hint-1761').style.display='inline'">
         Hint
       </button>
@@ -25,18 +25,18 @@
 <p>Add the <code class="language-json">POST api/acct/payments</code> endpoint. It must be available to unauthorized users, accept data in JSON format, and store it in the database. The operation must be transactional! The JSON is as follows:</p>
 <pre><code class="language-json">[
     {
-        "userDTO": "&lt;user email&gt;",
+        "employee": "&lt;user email&gt;",
         "period": "&lt;mm-YYYY&gt;",
         "salary": &lt;Long&gt;
     },
     {
-        "userDTO": "&lt;user1 email&gt;",
+        "employee": "&lt;user1 email&gt;",
         "period": "&lt;mm-YYYY&gt;",
         "salary": &lt;Long&gt;
     },
     ...
     {
-        "userDTO": "&lt;userN email&gt;",
+        "employee": "&lt;userN email&gt;",
         "period": "&lt;mm-YYYY&gt;",
         "salary": &lt;Long&gt;
     }
@@ -54,10 +54,10 @@
     "path": "/api/acct/payments"
 }</code></pre>
 <p>Take into consideration the following reasons for errors:</p>
-<p>The salary must be non-negative. The userDTO-period pair must be unique. In other words, it should not be possible to allocate the money twice (or thrice) during the same period. An userDTO must be among the users of our service. Error messages are up to you.</p>
+<p>The salary must be non-negative. The employee-period pair must be unique. In other words, it should not be possible to allocate the money twice (or thrice) during the same period. An employee must be among the users of our service. Error messages are up to you.</p>
 <p>Add the <code class="language-json">PUT api/acct/payments</code> endpoint. It must be available to unauthorized users, accept data in JSON format, and update the salary for the specified users in the database. The JSON must be as follows:</p>
 <pre><code class="language-json">{
-    "userDTO": "&lt;user email&gt;",
+    "employee": "&lt;user email&gt;",
     "period": "&lt;mm-YYYY&gt;",
     "salary": &lt;Long&gt;
 }</code></pre>
@@ -73,7 +73,7 @@
     "message": "&lt;error message&gt;",
     "path": "/api/acct/payments"
 }</code></pre>
-<p>Add the <code class="language-json">GET api/empl/payment</code> endpoint. It should be available only to authenticated users. It takes the <code class="language-json">period</code> parameter that specifies the period (the month and year) and provides the information for this period. If the parameter <code class="language-json">period</code> is not specified, the endpoint provides information about the userDTO's salary for each period from the database as an array of objects in descending order by date. JSON representation information about user salary must look like this:</p>
+<p>Add the <code class="language-json">GET api/empl/payment</code> endpoint. It should be available only to authenticated users. It takes the <code class="language-json">period</code> parameter that specifies the period (the month and year) and provides the information for this period. If the parameter <code class="language-json">period</code> is not specified, the endpoint provides information about the employee's salary for each period from the database as an array of objects in descending order by date. JSON representation information about user salary must look like this:</p>
 <pre><code class="language-json">{
    "name": "&lt;user name&gt;",
    "lastname": "&lt;user lastname&gt;",
@@ -94,17 +94,17 @@
 <p><em>Request body:</em></p>
 <pre><code class="language-json">[
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "01-2021",
         "salary": 123456
     },
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "02-2021",
         "salary": 123456
     },
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "03-2021",
         "salary": 123456
     }
@@ -118,17 +118,17 @@
 <p><em>Request body:</em></p>
 <pre><code class="language-json">[
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "01-2021",
         "salary": -1
     },
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "13-2021",
         "salary": 123456
     },
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "03-2021",
         "salary": 123456
     }
@@ -146,12 +146,12 @@
 <p><em>Request body:</em></p>
 <pre><code class="language-json">[
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "01-2021",
         "salary": 123456
     },
     {
-        "userDTO": "johndoe@acme.com",
+        "employee": "johndoe@acme.com",
         "period": "01-2021",
         "salary": 123456
     }
@@ -168,7 +168,7 @@
 <p><strong>Example 4: </strong><em>a </em><em>PUT request for api/acct/payments without authentication</em></p>
 <p><em>Request body:</em></p>
 <pre><code class="language-json">{
-    "userDTO": "johndoe@acme.com",
+    "employee": "johndoe@acme.com",
     "period": "01-2021",
     "salary": 123457
 }

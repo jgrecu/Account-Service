@@ -1,16 +1,15 @@
-package account.model;
+package account.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
-public class ChangePassRequest {
+public class ChangePassDTO {
     @JsonProperty("new_password")
     @NotBlank
     private String newPassword;
 
-    public ChangePassRequest() {
+    public ChangePassDTO() {
     }
 
     public String getNewPassword() {

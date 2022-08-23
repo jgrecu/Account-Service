@@ -1,7 +1,7 @@
 package account.controllers;
 
-import account.model.ChangePassRequest;
-import account.model.UserDTO;
+import account.dto.ChangePassDTO;
+import account.dto.UserDTO;
 import account.responses.ChangePassResponse;
 import account.responses.UserResponse;
 import account.service.UserService;
@@ -29,7 +29,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/changepass")
-    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassRequest passRequest) {
+    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassDTO passRequest) {
         return userService.updatePassword(principal.getName(), passRequest.getNewPassword());
     }
 }

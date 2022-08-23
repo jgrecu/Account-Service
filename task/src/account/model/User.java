@@ -1,5 +1,6 @@
 package account.model;
 
+import account.dto.UserDTO;
 import account.security.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
