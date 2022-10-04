@@ -19,7 +19,7 @@ public class UserResponse {
         this.id = user.getId();
         this.name = user.getName();
         this.lastname = user.getLastname();
-        this.email = user.getEmail();
+        this.email = user.getUsername();
     }
 
     public Long getId() {

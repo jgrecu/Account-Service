@@ -1110,15 +1110,6 @@ files:
         Optional<User> findByUsernameIgnoreCase(String username);
     }
   learner_created: true
-- name: src/account/security/Role.java
-  visible: true
-  text: |
-    package account.security;
-
-    public enum Role {
-        ADMINISTRATOR, USER, ACCOUNTANT
-    }
-  learner_created: true
 - name: src/account/controllers/AuthenticationController.java
   visible: true
   text: |
@@ -1317,7 +1308,25 @@ files:
         }
     }
   learner_created: true
-- name: src/account/service/UserServiceImpl.java
+- name: src/account/security/TestSecurity.java
+  visible: true
+  learner_created: true
+- name: src/account/service/JpaUserDetailsService.java
+  visible: true
+  learner_created: true
+- name: src/account/model/SecurityUser.java
+  visible: true
+  learner_created: true
+- name: src/account/model/Role.java
+  visible: true
+  text: |
+    package account.security;
+
+    public enum Role {
+        ADMINISTRATOR, USER, ACCOUNTANT
+    }
+  learner_created: true
+- name: src/account/service/UserService.java
   visible: true
   text: |
     package account.service;
@@ -1421,9 +1430,6 @@ files:
             return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
         }
     }
-  learner_created: true
-- name: src/account/service/UserService.java
-  visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16604#comment
 status: Unchecked
