@@ -1,10 +1,10 @@
 package account.service;
 
-import account.dto.UserDTO;
+import account.web.requests.UserRequest;
 import account.exceptions.UserNotAllowed;
 import account.model.User;
-import account.responses.ChangePassResponse;
-import account.responses.UserResponse;
+import account.web.responses.ChangePassResponse;
+import account.web.responses.UserResponse;
 import account.respository.UserRepository;
 import account.model.Role;
 import org.springframework.http.HttpStatus;
@@ -32,28 +32,26 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponse addEmployee(UserDTO userDTO) {
-        if (!userDTO.getEmail().endsWith("@acme.com")) {
-            //throw new UserNotAllowed("Email not allowed");
+    public UserResponse addEmployee(UserRequest userRequest) {
+        if (!userRequest.getEmail().endsWith("@acme.com")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not allowed");
         }
 
-        if (userDTO.getPassword().length() < 12) {
+        if (userRequest.getPassword().length() < 12) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password length must be 12 chars minimum!");
         }
 
-        if (breachedPasswords.contains(userDTO.getPassword())) {
+        if (breachedPasswords.contains(userRequest.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password is in the hacker's database!");
         }
 
-        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(userDTO.getEmail());
+        Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(userRequest.getEmail());
 
         if (optionalUser.isPresent()) {
-            //throw new UserExistsException("User exist!");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User exist!");
         }
 
-        User user = new User(userDTO, passwordEncoder.encode(userDTO.getPassword()), Role.USER);
+        User user = new User(userRequest, passwordEncoder.encode(userRequest.getPassword()), Role.USER);
 
         User savedUser = userRepository.save(user);
 

@@ -911,40 +911,6 @@ files:
         }
     }
   learner_created: true
-- name: src/account/responses/ChangePassResponse.java
-  visible: true
-  text: |
-    package account.responses;
-
-    public class ChangePassResponse {
-        private String email;
-        private String status;
-
-        public ChangePassResponse() {
-        }
-
-        public ChangePassResponse(String email, String status) {
-            this.email = email;
-            this.status = status;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-    }
-  learner_created: true
 - name: src/account/exceptions/UserNotAllowed.java
   visible: true
   text: |
@@ -1020,76 +986,6 @@ files:
             provider.setPasswordEncoder(passwordEncoder);
             provider.setUserDetailsService(userDetailsService);
             return provider;
-        }
-    }
-  learner_created: true
-- name: src/account/responses/UserResponse.java
-  visible: true
-  text: |
-    package account.responses;
-
-    import account.model.User;
-
-    public class UserResponse {
-        private Long id;
-        private String name;
-        private String lastname;
-        private String email;
-
-        public UserResponse(Long id, String name, String lastname, String email) {
-            this.id = id;
-            this.name = name;
-            this.lastname = lastname;
-            this.email = email;
-        }
-
-        public UserResponse(User user) {
-            this.id = user.getId();
-            this.name = user.getName();
-            this.lastname = user.getLastname();
-            this.email = user.getEmail();
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getLastname() {
-            return lastname;
-        }
-
-        public void setLastname(String lastname) {
-            this.lastname = lastname;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        @Override
-        public String toString() {
-            return "EmployeeResponse{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", lastname='" + lastname + '\'' +
-                    ", email='" + email + '\'' +
-                    '}';
         }
     }
   learner_created: true
@@ -1173,143 +1069,6 @@ files:
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
         }
     }
-  learner_created: true
-- name: src/account/security/PasswordEncoderConfig.java
-  visible: true
-  text: |
-    package account.security;
-
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-    import org.springframework.security.crypto.password.PasswordEncoder;
-
-    @Configuration
-    public class PasswordEncoderConfig {
-
-        @Bean
-        public PasswordEncoder passwordEncoder(){
-            return new BCryptPasswordEncoder(13);
-        }
-    }
-  learner_created: true
-- name: src/account/dto/UserDTO.java
-  visible: true
-  text: |
-    package account.model;
-
-    import com.fasterxml.jackson.annotation.JsonIgnore;
-    import com.fasterxml.jackson.annotation.JsonProperty;
-
-    import javax.validation.constraints.Email;
-    import javax.validation.constraints.NotBlank;
-    import javax.validation.constraints.NotNull;
-    import java.util.List;
-
-    public class UserDTO {
-
-        @NotBlank
-        private String name;
-        @NotBlank
-        private String lastname;
-        @NotBlank
-        private String email;
-        @NotBlank
-        private String password;
-
-        private List<String> roles;
-
-        public UserDTO() {
-        }
-
-        public UserDTO(String name, String lastname, String email, String password) {
-            this.name = name;
-            this.lastname = lastname;
-            this.email = email;
-            this.password = password;
-        }
-
-        public UserDTO(String name, String lastname, String email, List<String> roles) {
-            this.name = name;
-            this.lastname = lastname;
-            this.email = email;
-            this.roles = roles;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getLastname() {
-            return lastname;
-        }
-
-        public void setLastname(String lastname) {
-            this.lastname = lastname;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        @JsonIgnore
-        @JsonProperty(value = "password")
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        @Override
-        public String toString() {
-            return "Employee{" +
-                    "name='" + name + '\'' +
-                    ", lastname='" + lastname + '\'' +
-                    ", email='" + email + '\'' +
-                    ", password='" + password + '\'' +
-                    '}';
-        }
-    }
-  learner_created: true
-- name: src/account/dto/ChangePassDTO.java
-  visible: true
-  text: |
-    package account.model;
-
-    import com.fasterxml.jackson.annotation.JsonProperty;
-
-    import javax.validation.constraints.NotBlank;
-    import javax.validation.constraints.Size;
-
-    public class ChangePassRequest {
-        @JsonProperty("new_password")
-        @NotBlank
-        private String newPassword;
-
-        public ChangePassRequest() {
-        }
-
-        public String getNewPassword() {
-            return newPassword;
-        }
-
-        public void setNewPassword(String newPassword) {
-            this.newPassword = newPassword;
-        }
-    }
-  learner_created: true
-- name: src/account/security/TestSecurity.java
-  visible: true
   learner_created: true
 - name: src/account/service/JpaUserDetailsService.java
   visible: true
@@ -1430,6 +1189,243 @@ files:
             return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
         }
     }
+  learner_created: true
+- name: src/account/controllers/AccountantController.java
+  visible: true
+  learner_created: true
+- name: src/account/model/Payment.java
+  visible: true
+  learner_created: true
+- name: src/account/web/responses/ChangePassResponse.java
+  visible: true
+  text: |
+    package account.responses;
+
+    public class ChangePassResponse {
+        private String email;
+        private String status;
+
+        public ChangePassResponse() {
+        }
+
+        public ChangePassResponse(String email, String status) {
+            this.email = email;
+            this.status = status;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+    }
+  learner_created: true
+- name: src/account/web/responses/PaymentsResponse.java
+  visible: true
+  learner_created: true
+- name: src/account/web/responses/UserResponse.java
+  visible: true
+  text: |
+    package account.responses;
+
+    import account.model.User;
+
+    public class UserResponse {
+        private Long id;
+        private String name;
+        private String lastname;
+        private String email;
+
+        public UserResponse(Long id, String name, String lastname, String email) {
+            this.id = id;
+            this.name = name;
+            this.lastname = lastname;
+            this.email = email;
+        }
+
+        public UserResponse(User user) {
+            this.id = user.getId();
+            this.name = user.getName();
+            this.lastname = user.getLastname();
+            this.email = user.getEmail();
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        @Override
+        public String toString() {
+            return "EmployeeResponse{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", lastname='" + lastname + '\'' +
+                    ", email='" + email + '\'' +
+                    '}';
+        }
+    }
+  learner_created: true
+- name: src/account/web/requests/ChangePassRequest.java
+  visible: true
+  text: |
+    package account.model;
+
+    import com.fasterxml.jackson.annotation.JsonProperty;
+
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Size;
+
+    public class ChangePassRequest {
+        @JsonProperty("new_password")
+        @NotBlank
+        private String newPassword;
+
+        public ChangePassRequest() {
+        }
+
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+    }
+  learner_created: true
+- name: src/account/web/requests/UserRequest.java
+  visible: true
+  text: |
+    package account.model;
+
+    import com.fasterxml.jackson.annotation.JsonIgnore;
+    import com.fasterxml.jackson.annotation.JsonProperty;
+
+    import javax.validation.constraints.Email;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+    import java.util.List;
+
+    public class UserDTO {
+
+        @NotBlank
+        private String name;
+        @NotBlank
+        private String lastname;
+        @NotBlank
+        private String email;
+        @NotBlank
+        private String password;
+
+        private List<String> roles;
+
+        public UserDTO() {
+        }
+
+        public UserDTO(String name, String lastname, String email, String password) {
+            this.name = name;
+            this.lastname = lastname;
+            this.email = email;
+            this.password = password;
+        }
+
+        public UserDTO(String name, String lastname, String email, List<String> roles) {
+            this.name = name;
+            this.lastname = lastname;
+            this.email = email;
+            this.roles = roles;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        @JsonIgnore
+        @JsonProperty(value = "password")
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        @Override
+        public String toString() {
+            return "Employee{" +
+                    "name='" + name + '\'' +
+                    ", lastname='" + lastname + '\'' +
+                    ", email='" + email + '\'' +
+                    ", password='" + password + '\'' +
+                    '}';
+        }
+    }
+  learner_created: true
+- name: src/account/web/requests/PaymentRequest.java
+  visible: true
+  learner_created: true
+- name: src/account/service/PaymentService.java
+  visible: true
+  learner_created: true
+- name: src/account/respository/PaymentRepository.java
+  visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16604#comment
 status: Unchecked

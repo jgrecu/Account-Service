@@ -1,4 +1,4 @@
-package account.responses;
+package account.web.responses;
 
 public class ChangePassResponse {
     private String email;

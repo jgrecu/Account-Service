@@ -1,9 +1,9 @@
 package account.controllers;
 
-import account.dto.ChangePassDTO;
-import account.dto.UserDTO;
-import account.responses.ChangePassResponse;
-import account.responses.UserResponse;
+import account.web.requests.ChangePassRequest;
+import account.web.requests.UserRequest;
+import account.web.responses.ChangePassResponse;
+import account.web.responses.UserResponse;
 import account.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +24,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public UserResponse registerUser(@Valid @RequestBody UserDTO userDTO) {
-        return userService.addEmployee(userDTO);
+    public UserResponse registerUser(@Valid @RequestBody UserRequest userRequest) {
+        return userService.addEmployee(userRequest);
     }
 
     @PostMapping("/changepass")
-    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassDTO passRequest) {
+    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassRequest passRequest) {
         return userService.updatePassword(principal.getName(), passRequest.getNewPassword());
     }
 }

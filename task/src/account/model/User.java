@@ -1,6 +1,6 @@
 package account.model;
 
-import account.dto.UserDTO;
+import account.web.requests.UserRequest;
 
 import javax.persistence.*;
 
@@ -20,11 +20,11 @@ public class User {
     public User() {
     }
 
-    public User(UserDTO userDTO, String password, Role role) {
+    public User(UserRequest userRequest, String password, Role role) {
         this.password = password;
-        this.name = userDTO.getName();
-        this.lastname = userDTO.getLastname();
-        this.username = userDTO.getEmail();
+        this.name = userRequest.getName();
+        this.lastname = userRequest.getLastname();
+        this.username = userRequest.getEmail();
         this.roles = role.name();
     }
 

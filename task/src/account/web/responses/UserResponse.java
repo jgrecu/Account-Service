@@ -1,4 +1,4 @@
-package account.responses;
+package account.web.responses;
 
 import account.model.User;
 
