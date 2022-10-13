@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class PaymentService {
         for (PaymentRequest paymentRequest : paymentList) {
             Payment payment = new Payment();
             payment.setSalary(paymentRequest.getSalary());
-            payment.setEmployee(paymentRequest.getEmployee());
+            payment.setEmployee(paymentRequest.getEmployee().toLowerCase());
             LocalDate date = convertPeriodStringToLocalDate(paymentRequest.getPeriod());
             payment.setPeriod(date);
 
@@ -50,6 +49,30 @@ public class PaymentService {
 
             paymentRepository.saveAndFlush(payment);
         }
+        return true;
+    }
+
+    @Transactional
+    public boolean updatePayment(PaymentRequest paymentRequest) {
+        Payment payment = new Payment();
+        payment.setSalary(paymentRequest.getSalary());
+
+        userRepository.findByUsernameIgnoreCase(paymentRequest.getEmployee())
+                .orElseThrow(() ->
+                        new EmployeeNotFoundException("User \"" + paymentRequest.getEmployee() + "\" not found!"));
+
+        payment.setEmployee(paymentRequest.getEmployee());
+        LocalDate date = convertPeriodStringToLocalDate(paymentRequest.getPeriod());
+        payment.setPeriod(date);
+        payment.setSalary(paymentRequest.getSalary());
+
+        Optional<Payment> optionalPayment = paymentRepository.
+                findByEmployeeAndPeriod(paymentRequest.getEmployee().toLowerCase(), date);
+
+        optionalPayment.ifPresent(value -> payment.setId(value.getId()));
+
+        paymentRepository.save(payment);
+
         return true;
     }
 

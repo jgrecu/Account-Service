@@ -1427,6 +1427,15 @@ files:
 - name: src/account/respository/PaymentRepository.java
   visible: true
   learner_created: true
+- name: src/account/web/responses/UserPaymentsResponse.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/BadRequestException.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16604#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Thu, 13 Oct 2022 11:10:52 UTC
 record: -1

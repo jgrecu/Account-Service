@@ -26,13 +26,13 @@ public class AccountantController {
 
     @PostMapping("/payments")
     public PaymentsResponse uploadPayrolls(@RequestBody List<@Valid PaymentRequest> paymentList) {
-        boolean successful = paymentService.addPaymentsBatch(paymentList);
-        return new PaymentsResponse("Updated successfully!");
+        paymentService.addPaymentsBatch(paymentList);
+        return new PaymentsResponse("Added successfully!");
     }
 
     @PutMapping("/payments")
     public PaymentsResponse updateSalary(@Valid @RequestBody PaymentRequest payment) {
-        System.out.println(payment);
+        paymentService.updatePayment(payment);
         return new PaymentsResponse("Updated successfully!");
     }
 
