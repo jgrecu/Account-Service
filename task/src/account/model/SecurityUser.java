@@ -30,7 +30,7 @@ public class SecurityUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getUserGroups()
                 .stream()
-                .map(group -> new SimpleGrantedAuthority(group.getName().toLowerCase()))
+                .map(group -> new SimpleGrantedAuthority(group.getName()))
                 .collect(Collectors.toList());
     }
 

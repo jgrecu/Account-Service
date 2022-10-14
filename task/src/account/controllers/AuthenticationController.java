@@ -25,7 +25,9 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public UserResponse registerUser(@Valid @RequestBody UserRequest userRequest) {
-        return userService.addUser(userRequest);
+        UserResponse userResponse = userService.addUser(userRequest);
+        System.out.println("REPLY: " + userResponse);
+        return userResponse;
     }
 
     @PostMapping("/changepass")

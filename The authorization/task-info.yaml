@@ -2134,6 +2134,12 @@ files:
 - name: src/account/bootstrap/GroupDataLoader.java
   visible: true
   learner_created: true
+- name: src/account/controllers/AdminController.java
+  visible: true
+  learner_created: true
+- name: src/account/web/responses/DeleteUserResponse.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16605#comment
 status: Unchecked
 record: -1

@@ -63,13 +63,22 @@ public class UserResponse {
         this.email = email;
     }
 
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
     @Override
     public String toString() {
-        return "EmployeeResponse{" +
+        return "UserResponse{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
+                ", roles=" + roles +
                 '}';
     }
 }

@@ -8,9 +8,11 @@ import account.respository.PaymentRepository;
 import account.web.requests.UserRequest;
 import account.model.User;
 import account.web.responses.ChangePassResponse;
+import account.web.responses.DeleteUserResponse;
 import account.web.responses.UserPaymentsResponse;
 import account.web.responses.UserResponse;
 import account.respository.UserRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -93,6 +96,11 @@ public class UserService {
                 "User not found!"));
     }
 
+    public List<UserResponse> getAllUsers() {
+        List<User> userList = userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+        return userList.stream().map(UserResponse::new).collect(Collectors.toList());
+    }
+
     public ChangePassResponse updatePassword(String userName, String newPassword) {
         if (newPassword.length() < 12) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password length must be 12 chars minimum!");
@@ -118,7 +126,7 @@ public class UserService {
         return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
     }
 
-    public void deleteUser(String email) {
+    public DeleteUserResponse deleteUser(String email) {
         User userToDelete = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -130,8 +138,12 @@ public class UserService {
         if (roleAdministrator) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
         }
+        DeleteUserResponse userResponse =
+                new DeleteUserResponse(userToDelete.getUsername(), "Deleted successfully!");
 
         userRepository.delete(userToDelete);
+
+        return userResponse;
     }
 
     public UserResponse grantRoles(String email, String role) {
