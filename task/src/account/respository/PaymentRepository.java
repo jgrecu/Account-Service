@@ -14,4 +14,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByEmployeeAndPeriod(@Param("employee") String employee, @Param("date") LocalDate date);
 
     List<Payment> findByEmployeeOrderByPeriodDesc(String employee);
+
+    List<Payment> findAllByEmployeeIgnoreCaseOrderByPeriodDesc(String employee);
 }

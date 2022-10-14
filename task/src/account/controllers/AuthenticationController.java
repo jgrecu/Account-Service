@@ -1,6 +1,6 @@
 package account.controllers;
 
-import account.web.requests.ChangePassRequest;
+import account.web.requests.ChangePasswordRequest;
 import account.web.requests.UserRequest;
 import account.web.responses.ChangePassResponse;
 import account.web.responses.UserResponse;
@@ -25,11 +25,11 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public UserResponse registerUser(@Valid @RequestBody UserRequest userRequest) {
-        return userService.addEmployee(userRequest);
+        return userService.addUser(userRequest);
     }
 
     @PostMapping("/changepass")
-    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePassRequest passRequest) {
+    public ChangePassResponse updatePassword(Principal principal, @Valid @RequestBody ChangePasswordRequest passRequest) {
         return userService.updatePassword(principal.getName(), passRequest.getNewPassword());
     }
 }

@@ -1,16 +1,16 @@
 package account.service;
 
 import account.exceptions.EmployeeNotFoundException;
+import account.model.Group;
 import account.model.Payment;
+import account.respository.GroupRepository;
 import account.respository.PaymentRepository;
 import account.web.requests.UserRequest;
-import account.exceptions.UserNotAllowed;
 import account.model.User;
 import account.web.responses.ChangePassResponse;
 import account.web.responses.UserPaymentsResponse;
 import account.web.responses.UserResponse;
 import account.respository.UserRepository;
-import account.model.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,19 +33,22 @@ public class UserService {
 
     private final PaymentRepository paymentRepository;
 
+    private final GroupRepository groupRepository;
+
     private final Set<String> breachedPasswords = Set.of("PasswordForJanuary", "PasswordForFebruary",
             "PasswordForMarch", "PasswordForApril", "PasswordForMay", "PasswordForJune", "PasswordForJuly",
             "PasswordForAugust", "PasswordForSeptember", "PasswordForOctober", "PasswordForNovember",
             "PasswordForDecember");
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       PaymentRepository paymentRepository) {
+                       PaymentRepository paymentRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.paymentRepository = paymentRepository;
+        this.groupRepository = groupRepository;
     }
 
-    public UserResponse addEmployee(UserRequest userRequest) {
+    public UserResponse addUser(UserRequest userRequest) {
         if (!userRequest.getEmail().endsWith("@acme.com")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not allowed");
         }
@@ -64,7 +67,10 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User exist!");
         }
 
-        User user = new User(userRequest, passwordEncoder.encode(userRequest.getPassword()), Role.USER);
+        String role = userRepository.count() == 0 ? "ROLE_ADMINISTRATOR" : "ROLE_USER";
+
+        User user = new User(userRequest, passwordEncoder.encode(userRequest.getPassword()));
+        user.addGroup(new Group(role));
 
         User savedUser = userRepository.save(user);
 
@@ -74,7 +80,8 @@ public class UserService {
     public UserResponse getUser(String user) {
         Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(user);
 
-        return optionalUser.map(UserResponse::new).orElseThrow(() -> new UserNotAllowed("test"));
+        return optionalUser.map(UserResponse::new).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "User not found!"));
     }
 
     public ChangePassResponse updatePassword(String userName, String newPassword) {
@@ -86,7 +93,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password is in the hacker's database!");
         }
 
-        User user = userRepository.findByUsernameIgnoreCase(userName).get();
+        User user = userRepository.findByUsernameIgnoreCase(userName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
 
         String oldPassword = user.getPassword();
@@ -101,8 +109,79 @@ public class UserService {
         return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
     }
 
+    public void deleteUser(String email) {
+        User userToDelete = userRepository.findByUsernameIgnoreCase(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        boolean roleAdministrator = userToDelete
+                .getUserGroups()
+                .stream()
+                .anyMatch(group -> userToDelete.hasGroup("ROLE_ADMINISTRATOR"));
+
+        if (roleAdministrator) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
+        }
+
+        userRepository.delete(userToDelete);
+    }
+
+    public UserResponse grantRoles(String email, String role) {
+        User user = userRepository.findByUsernameIgnoreCase(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        Group newGroup = groupRepository.findByName("ROLE_" + role.toUpperCase())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!"));
+
+        Set<Group> userGroups = user.getUserGroups();
+
+        Optional<Group> adm = userGroups.stream().filter(Group::isAdministrative).findFirst();
+        Optional<Group> biz = userGroups.stream().filter(Group::isBusiness).findFirst();
+
+        if (newGroup.isAdministrative() && adm.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The user cannot combine administrative and business roles!");
+        } else if (newGroup.isBusiness() && adm.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The user cannot combine administrative and business roles!");
+        }
+
+        user.addGroup(newGroup);
+
+        User savedUser = userRepository.save(user);
+
+        return new UserResponse(savedUser);
+    }
+
+    public UserResponse removeRole(String email, String role) {
+        User user = userRepository.findByUsernameIgnoreCase(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        Group groupToDelete = groupRepository.findByName("ROLE_" + role)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!"));
+
+        Set<Group> userGroups = user.getUserGroups();
+
+        if (!userGroups.contains(groupToDelete)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user does not have a role!");
+        }
+
+        if (groupToDelete.getName().equals("ROLE_ADMINISTRATOR")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
+        }
+
+        if (userGroups.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user must have at least one role!");
+        }
+
+        userGroups.remove(groupToDelete);
+        User savedUser = userRepository.save(user);
+
+        return new UserResponse(savedUser);
+    }
+
     public List<UserPaymentsResponse> getUserPayments(String user) {
-        User retrievedUser = userRepository.findByUsernameIgnoreCase(user).get();
+        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
         String name = retrievedUser.getName();
         String lastName = retrievedUser.getLastname();
 
@@ -120,7 +199,8 @@ public class UserService {
     }
 
     public UserPaymentsResponse getUserPaymentForPeriod(String user, String period) {
-        User retrievedUser = userRepository.findByUsernameIgnoreCase(user).get();
+        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
         String name = retrievedUser.getName();
         String lastName = retrievedUser.getLastname();
         LocalDate date = convertPeriodStringToLocalDate(period);
@@ -129,8 +209,8 @@ public class UserService {
                 .findByEmployeeAndPeriod(user.toLowerCase(), date);
 
         return paymentOptional.map(payment -> new UserPaymentsResponse(name, lastName,
-                convertLocalDateToNicePeriodString(payment.getPeriod()),
-                convertSalaryInDollarsAndCents(payment.getSalary())))
+                        convertLocalDateToNicePeriodString(payment.getPeriod()),
+                        convertSalaryInDollarsAndCents(payment.getSalary())))
                 .orElseThrow(() -> new EmployeeNotFoundException("Payment not found for the period"));
     }
 
@@ -139,11 +219,13 @@ public class UserService {
         String periodYear = String.valueOf(date.getYear());
         return periodMonth + "-" + periodYear;
     }
+
     private LocalDate convertPeriodStringToLocalDate(String period) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
         YearMonth ym = YearMonth.parse(period, formatter);
         return ym.atEndOfMonth();
     }
+
     private String convertToTitleCaseIteratingChars(String text) {
         if (text == null || text.isEmpty()) {
             return text;

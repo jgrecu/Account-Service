@@ -3,6 +3,9 @@ package account.model;
 import account.web.requests.UserRequest;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -15,17 +18,39 @@ public class User {
     private String password;
     private String name;
     private String lastname;
-    private String roles;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "user_groups",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
+    private Set<Group> userGroups = new HashSet<>();
 
     public User() {
     }
 
-    public User(UserRequest userRequest, String password, Role role) {
+    public User(UserRequest userRequest, String password) {
         this.password = password;
         this.name = userRequest.getName();
         this.lastname = userRequest.getLastname();
         this.username = userRequest.getEmail();
-        this.roles = role.name();
+    }
+
+    public void addGroup(Group group) {
+        userGroups.add(group);
+        group.getUsers().add(this);
+    }
+
+    public void removeGroup(Group group) {
+        userGroups.remove(group);
+        group.getUsers().remove(this);
+    }
+
+    public boolean hasGroup(String groupName) {
+        return userGroups.stream()
+                .anyMatch(group -> group.getName().equals(groupName));
     }
 
     public Long getId() {
@@ -64,12 +89,12 @@ public class User {
         this.lastname = lastname;
     }
 
-    public String getRoles() {
-        return roles;
+    public Set<Group> getUserGroups() {
+        return userGroups;
     }
 
-    public void setRoles(String roles) {
-        this.roles = roles;
+    public void setUserGroups(Set<Group> userGroups) {
+        this.userGroups = userGroups;
     }
 
     @Override
@@ -80,7 +105,7 @@ public class User {
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
-                ", roles='" + roles + '\'' +
+                ", roles='" + userGroups + '\'' +
                 '}';
     }
 }

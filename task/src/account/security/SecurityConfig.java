@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -26,24 +27,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.userDetailsService = userDetailsService;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
-
-/*    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .httpBasic(basic -> basic.authenticationEntryPoint(restAuthenticationEntryPoint))
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers.frameOptions().disable())
-                .authorizeRequests(auth -> auth
-                        .antMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
-                        .antMatchers(HttpMethod.POST, "/api/auth/changepass").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name(), Role.ADMINISTRATOR.name())
-                        .antMatchers(HttpMethod.GET, "/api/empl/payment").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name())
-                        .antMatchers(HttpMethod.POST, "/api/acct/payments").hasAnyAuthority(Role.ACCOUNTANT.name())
-                        .antMatchers(HttpMethod.PUT, "/api/acct/payments").hasAnyAuthority(Role.ACCOUNTANT.name())
-                )
-                .userDetailsService(userDetailsService)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
-    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -62,12 +45,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable().headers().frameOptions().disable()
                 .and()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/changepass").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name(), Role.ADMINISTRATOR.name())
-                .antMatchers(HttpMethod.GET, "/api/empl/payment").hasAnyAuthority(Role.ACCOUNTANT.name(), Role.USER.name())
-                .antMatchers(HttpMethod.POST, "/api/acct/payments").permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/acct/payments").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/changepass/**").hasAnyAuthority("ROLE_USER", "ROLE_ACCOUNTANT", "ROLE_ADMINISTRATOR")
+                .antMatchers(HttpMethod.GET, "/api/empl/payment/**").hasAnyAuthority("ROLE_USER", "ROLE_ACCOUNTANT")
+                .antMatchers(HttpMethod.POST, "/api/acct/payments/**").hasAuthority("ROLE_ACCOUNTANT")
+                .antMatchers(HttpMethod.PUT, "/api/acct/payments/**").hasAuthority("ROLE_ACCOUNTANT")
+                .antMatchers(HttpMethod.PUT, "/api/admin/user/role/**").hasAuthority("ROLE_ADMINISTRATOR")
+                .antMatchers(HttpMethod.DELETE, "/api/admin/user/**").hasAuthority("ROLE_ADMINISTRATOR")
+                .antMatchers(HttpMethod.GET, "/api/admin/user/**").hasAuthority("ROLE_ADMINISTRATOR")
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -79,5 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailsService);
         return provider;
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 }

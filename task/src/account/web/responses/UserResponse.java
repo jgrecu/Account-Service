@@ -1,6 +1,11 @@
 package account.web.responses;
 
+import account.model.Group;
 import account.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserResponse {
     private Long id;
@@ -8,11 +13,14 @@ public class UserResponse {
     private String lastname;
     private String email;
 
-    public UserResponse(Long id, String name, String lastname, String email) {
+    private List<String> roles;
+
+    public UserResponse(Long id, String name, String lastname, String email, List<String> roles) {
         this.id = id;
         this.name = name;
         this.lastname = lastname;
         this.email = email;
+        this.roles = roles;
     }
 
     public UserResponse(User user) {
@@ -20,6 +28,7 @@ public class UserResponse {
         this.name = user.getName();
         this.lastname = user.getLastname();
         this.email = user.getUsername();
+        this.roles = user.getUserGroups().stream().map(Group::getName).sorted().collect(Collectors.toList());
     }
 
     public Long getId() {
