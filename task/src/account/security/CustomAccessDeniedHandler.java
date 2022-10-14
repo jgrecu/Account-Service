@@ -13,7 +13,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     //private final LoggingService loggingService;
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
         String user = request.getRemoteUser();
         if (user == null) user = "Anonymous";
 
