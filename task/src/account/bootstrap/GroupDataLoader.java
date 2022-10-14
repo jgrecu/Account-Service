@@ -3,6 +3,7 @@ package account.bootstrap;
 import account.model.Group;
 import account.respository.GroupRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,7 @@ public class GroupDataLoader {
     }
 
 
+    @Bean
     public CommandLineRunner commandLineRunner(GroupRepository repository) {
         return args -> {
             if (repository.findByName("ROLE_ADMINISTRATOR").isEmpty()) {

@@ -67,10 +67,19 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User exist!");
         }
 
-        String role = userRepository.count() == 0 ? "ROLE_ADMINISTRATOR" : "ROLE_USER";
+        Group group;
+        if (userRepository.count() == 0) {
+            group = groupRepository.findByName("ROLE_ADMINISTRATOR")
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found!"));
+
+        } else {
+            group = groupRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found!"));
+
+        }
 
         User user = new User(userRequest, passwordEncoder.encode(userRequest.getPassword()));
-        user.addGroup(new Group(role));
+        user.addGroup(group);
 
         User savedUser = userRepository.save(user);
 
@@ -137,7 +146,7 @@ public class UserService {
         Optional<Group> adm = userGroups.stream().filter(Group::isAdministrative).findFirst();
         Optional<Group> biz = userGroups.stream().filter(Group::isBusiness).findFirst();
 
-        if (newGroup.isAdministrative() && adm.isPresent()) {
+        if (newGroup.isAdministrative() && biz.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "The user cannot combine administrative and business roles!");
         } else if (newGroup.isBusiness() && adm.isPresent()) {
