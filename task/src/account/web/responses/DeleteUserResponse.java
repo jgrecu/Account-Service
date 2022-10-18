@@ -9,7 +9,7 @@ public class DeleteUserResponse {
     }
 
     public DeleteUserResponse(String user, String status) {
-        this.user = user;
+        this.user = user.toLowerCase();
         this.status = status;
     }
 

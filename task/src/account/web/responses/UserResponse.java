@@ -27,7 +27,7 @@ public class UserResponse {
         this.id = user.getId();
         this.name = user.getName();
         this.lastname = user.getLastname();
-        this.email = user.getUsername();
+        this.email = user.getUsername().toLowerCase();
         this.roles = user.getUserGroups().stream().map(Group::getName).sorted().collect(Collectors.toList());
     }
 

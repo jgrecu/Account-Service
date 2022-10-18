@@ -273,7 +273,7 @@ public class UserService {
     private String convertSalaryInDollarsAndCents(Long salary) {
 
         long dollars = (salary > 0 & salary < 100) ? 0 : salary / 100;
-        long cents = dollars > 0 ? salary % dollars : salary;
+        long cents = dollars > 0 ? salary % 100 : salary;
 
         return dollars + " dollar(s) " + cents + " cent(s)";
     }
