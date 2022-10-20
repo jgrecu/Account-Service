@@ -35,7 +35,7 @@ public class Group {
             isAdministrative = true;
         }
 
-        if (name.equals("ROLE_USER") || name.equals("ROLE_ACCOUNTANT")) {
+        if (name.equals("ROLE_USER") || name.equals("ROLE_ACCOUNTANT") || name.equals("ROLE_AUDITOR")) {
             isBusiness = true;
             isAdministrative = false;
         }

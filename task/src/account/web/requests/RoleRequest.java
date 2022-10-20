@@ -1,12 +1,15 @@
 package account.web.requests;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 public class RoleRequest {
 
     @NotBlank
     private String user;
     private String role;
+
+    @Pattern(regexp = "GRANT|REMOVE")
     private Operation operation;
 
     public enum Operation {

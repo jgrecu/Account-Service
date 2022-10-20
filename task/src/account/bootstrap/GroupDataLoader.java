@@ -28,6 +28,9 @@ public class GroupDataLoader {
             if (repository.findByName("ROLE_ACCOUNTANT").isEmpty()) {
                 repository.save(new Group("ROLE_ACCOUNTANT"));
             }
+            if (repository.findByName("ROLE_AUDITOR").isEmpty()) {
+                repository.save(new Group("ROLE_AUDITOR"));
+            }
         };
     }
 }

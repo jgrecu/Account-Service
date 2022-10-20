@@ -2,15 +2,20 @@ package account.service;
 
 import account.exceptions.EmployeeNotFoundException;
 import account.model.Payment;
+import account.model.User;
 import account.respository.PaymentRepository;
 import account.respository.UserRepository;
 import account.web.requests.PaymentRequest;
+import account.web.responses.UserPaymentsResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,9 +81,68 @@ public class PaymentService {
         return true;
     }
 
+    public List<UserPaymentsResponse> getUserPayments(String user) {
+        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+        String name = retrievedUser.getName();
+        String lastName = retrievedUser.getLastname();
+
+        List<Payment> paymentList = paymentRepository.findByEmployeeOrderByPeriodDesc(user.toLowerCase());
+
+        List<UserPaymentsResponse> userPaymentsResponseList = new ArrayList<>();
+
+        for (Payment payment : paymentList) {
+            String periodString = convertLocalDateToNicePeriodString(payment.getPeriod());
+            String salary = convertSalaryInDollarsAndCents(payment.getSalary());
+            userPaymentsResponseList.add(new UserPaymentsResponse(name, lastName, periodString, salary));
+        }
+
+        return userPaymentsResponseList;
+    }
+
+    public UserPaymentsResponse getUserPaymentForPeriod(String user, String period) {
+        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+        String name = retrievedUser.getName();
+        String lastName = retrievedUser.getLastname();
+        LocalDate date = convertPeriodStringToLocalDate(period);
+
+        Optional<Payment> paymentOptional = paymentRepository
+                .findByEmployeeAndPeriod(user.toLowerCase(), date);
+
+        return paymentOptional.map(payment -> new UserPaymentsResponse(name, lastName,
+                        convertLocalDateToNicePeriodString(payment.getPeriod()),
+                        convertSalaryInDollarsAndCents(payment.getSalary())))
+                .orElseThrow(() -> new EmployeeNotFoundException("Payment not found for the period"));
+    }
+
+    private String convertLocalDateToNicePeriodString(LocalDate date) {
+        String periodMonth = convertToTitleCaseIteratingChars(date.getMonth().toString());
+        String periodYear = String.valueOf(date.getYear());
+        return periodMonth + "-" + periodYear;
+    }
+
     private LocalDate convertPeriodStringToLocalDate(String period) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
         YearMonth ym = YearMonth.parse(period, formatter);
         return ym.atEndOfMonth();
+    }
+
+    private String convertToTitleCaseIteratingChars(String text) {
+        if (text == null || text.isEmpty() || text.isBlank()) {
+            return text;
+        }
+
+        String firstLetter = String.valueOf(text.strip().charAt(0));
+
+        return text.strip().toLowerCase().replaceFirst(firstLetter.toLowerCase(), firstLetter.toUpperCase());
+    }
+
+    private String convertSalaryInDollarsAndCents(Long salary) {
+
+        long dollars = (salary > 0 & salary < 100) ? 0 : salary / 100;
+        long cents = dollars > 0 ? salary % 100 : salary;
+
+        return dollars + " dollar(s) " + cents + " cent(s)";
     }
 }

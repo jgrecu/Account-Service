@@ -1,6 +1,7 @@
 package account.controllers;
 
 import account.exceptions.BadRequestException;
+import account.service.PaymentService;
 import account.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,11 @@ import java.util.regex.Pattern;
 public class EmployeeController {
 
     private final UserService userService;
+    private final PaymentService paymentService;
 
-    public EmployeeController(UserService userService) {
+    public EmployeeController(UserService userService, PaymentService paymentService) {
         this.userService = userService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/payment")
@@ -33,9 +36,9 @@ public class EmployeeController {
         String name = principal.getName();
         System.out.println("period: " + period);
         if (period != null) {
-            return ResponseEntity.ok(userService.getUserPaymentForPeriod(name, period));
+            return ResponseEntity.ok(paymentService.getUserPaymentForPeriod(name, period));
         }
-        return ResponseEntity.ok(userService.getUserPayments(name));
+        return ResponseEntity.ok(paymentService.getUserPayments(name));
     }
 
     @ExceptionHandler({ConstraintViolationException.class, org.hibernate.exception.ConstraintViolationException.class})

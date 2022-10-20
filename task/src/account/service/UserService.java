@@ -1,16 +1,13 @@
 package account.service;
 
-import account.exceptions.EmployeeNotFoundException;
 import account.model.Group;
-import account.model.Payment;
+import account.model.LogEntry;
+import account.model.SecurityUser;
 import account.respository.GroupRepository;
 import account.respository.PaymentRepository;
 import account.web.requests.UserRequest;
 import account.model.User;
-import account.web.responses.ChangePassResponse;
-import account.web.responses.DeleteUserResponse;
-import account.web.responses.UserPaymentsResponse;
-import account.web.responses.UserResponse;
+import account.web.responses.*;
 import account.respository.UserRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -18,10 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    public static final int MAX_FAILED_ATTEMPTS = 5;
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -38,17 +32,21 @@ public class UserService {
 
     private final GroupRepository groupRepository;
 
+    private final LoggingService loggingService;
+
     private final Set<String> breachedPasswords = Set.of("PasswordForJanuary", "PasswordForFebruary",
             "PasswordForMarch", "PasswordForApril", "PasswordForMay", "PasswordForJune", "PasswordForJuly",
             "PasswordForAugust", "PasswordForSeptember", "PasswordForOctober", "PasswordForNovember",
             "PasswordForDecember");
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       PaymentRepository paymentRepository, GroupRepository groupRepository) {
+                       PaymentRepository paymentRepository, GroupRepository groupRepository,
+                       LoggingService loggingService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.paymentRepository = paymentRepository;
         this.groupRepository = groupRepository;
+        this.loggingService = loggingService;
     }
 
     public UserResponse addUser(UserRequest userRequest) {
@@ -85,15 +83,24 @@ public class UserService {
         user.addGroup(group);
 
         User savedUser = userRepository.save(user);
-
+        loggingService.saveEntry(new LogEntry(
+                "CREATE_USER",
+                "Anonymous",
+                savedUser.getUsername().toLowerCase(),
+                "/api/auth/signup"));
         return new UserResponse(savedUser);
     }
 
-    public UserResponse getUser(String user) {
+    public UserResponse getUserResponse(String user) {
         Optional<User> optionalUser = userRepository.findByUsernameIgnoreCase(user);
 
         return optionalUser.map(UserResponse::new).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "User not found!"));
+    }
+
+    public User getUser(String user) {
+        return userRepository.findByUsernameIgnoreCase(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
     }
 
     public List<UserResponse> getAllUsers() {
@@ -123,10 +130,16 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
+        loggingService.saveEntry(new LogEntry(
+                "CHANGE_PASSWORD",
+                user.getUsername().toLowerCase(),
+                user.getUsername().toLowerCase(),
+                "/api/auth/changepass"));
+
         return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
     }
 
-    public DeleteUserResponse deleteUser(String email) {
+    public DeleteUserResponse deleteUser(String email, SecurityUser admin) {
         User userToDelete = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -143,10 +156,17 @@ public class UserService {
 
         userRepository.delete(userToDelete);
 
+        loggingService.saveEntry(new LogEntry(
+                "DELETE_USER",
+                admin.getUsername().toLowerCase(),
+                email.toLowerCase(),
+                "api/admin/user"
+        ));
+
         return userResponse;
     }
 
-    public UserResponse grantRoles(String email, String role) {
+    public UserResponse grantRoles(String email, String role, SecurityUser admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -170,10 +190,17 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
+        loggingService.saveEntry(new LogEntry(
+                "GRANT_ROLE",
+                admin.getUsername().toLowerCase(),
+                String.format("Grant role %s to %s", role, email.toLowerCase()),
+                "api/admin/user/role"
+
+        ));
         return new UserResponse(savedUser);
     }
 
-    public UserResponse removeRole(String email, String role) {
+    public UserResponse removeRole(String email, String role, SecurityUser admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -197,71 +224,70 @@ public class UserService {
         userGroups.remove(groupToDelete);
         User savedUser = userRepository.save(user);
 
+        loggingService.saveEntry(new LogEntry(
+                "REMOVE_ROLE",
+                admin.getUsername().toLowerCase(),
+                String.format("Remove role %s from %s", role, email.toLowerCase()),
+                "api/admin/user/role"
+
+        ));
+
         return new UserResponse(savedUser);
     }
 
-    public List<UserPaymentsResponse> getUserPayments(String user) {
-        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+    public LockUnlockResponse lockUser(String email, SecurityUser admin) {
+        User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
-        String name = retrievedUser.getName();
-        String lastName = retrievedUser.getLastname();
-
-        List<Payment> paymentList = paymentRepository.findByEmployeeOrderByPeriodDesc(user.toLowerCase());
-
-        List<UserPaymentsResponse> userPaymentsResponseList = new ArrayList<>();
-
-        for (Payment payment : paymentList) {
-            String periodString = convertLocalDateToNicePeriodString(payment.getPeriod());
-            String salary = convertSalaryInDollarsAndCents(payment.getSalary());
-            userPaymentsResponseList.add(new UserPaymentsResponse(name, lastName, periodString, salary));
+        if (user.hasGroup("ROLE_ADMINISTRATOR")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't lock the ADMINISTRATOR!");
         }
+        user.setLocked(true);
+        userRepository.save(user);
 
-        return userPaymentsResponseList;
+        loggingService.saveEntry(new LogEntry(
+                "LOCK_USER",
+                admin.getUsername().toLowerCase(),
+                String.format("Lock user %s", email.toLowerCase()),
+                "api/admin/user/access"
+
+        ));
+
+        return new LockUnlockResponse(user.getUsername().toLowerCase(), "locked");
     }
 
-    public UserPaymentsResponse getUserPaymentForPeriod(String user, String period) {
-        User retrievedUser = userRepository.findByUsernameIgnoreCase(user)
+    public void lockUser(String email) {
+        User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
-        String name = retrievedUser.getName();
-        String lastName = retrievedUser.getLastname();
-        LocalDate date = convertPeriodStringToLocalDate(period);
-
-        Optional<Payment> paymentOptional = paymentRepository
-                .findByEmployeeAndPeriod(user.toLowerCase(), date);
-
-        return paymentOptional.map(payment -> new UserPaymentsResponse(name, lastName,
-                        convertLocalDateToNicePeriodString(payment.getPeriod()),
-                        convertSalaryInDollarsAndCents(payment.getSalary())))
-                .orElseThrow(() -> new EmployeeNotFoundException("Payment not found for the period"));
-    }
-
-    private String convertLocalDateToNicePeriodString(LocalDate date) {
-        String periodMonth = convertToTitleCaseIteratingChars(date.getMonth().toString());
-        String periodYear = String.valueOf(date.getYear());
-        return periodMonth + "-" + periodYear;
-    }
-
-    private LocalDate convertPeriodStringToLocalDate(String period) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
-        YearMonth ym = YearMonth.parse(period, formatter);
-        return ym.atEndOfMonth();
-    }
-
-    private String convertToTitleCaseIteratingChars(String text) {
-        if (text == null || text.isEmpty() || text.isBlank()) {
-            return text;
+        if (user.hasGroup("ROLE_ADMINISTRATOR")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't lock the ADMINISTRATOR!");
         }
+        user.setLocked(true);
+        userRepository.save(user);
+    }
+    public LockUnlockResponse unlockUser(String email, SecurityUser admin) {
+        User user = userRepository.findByUsernameIgnoreCase(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+        user.setLocked(false);
+        user.setFailedAttempt(0);
 
-        String firstLetter = String.valueOf(text.strip().charAt(0));
+        loggingService.saveEntry(new LogEntry(
+                "UNLOCK_USER",
+                admin.getUsername().toLowerCase(),
+                String.format("Unlock user %s", email.toLowerCase()),
+                "api/admin/user/access"
+        ));
 
-        return text.strip().toLowerCase().replaceFirst(firstLetter.toLowerCase(), firstLetter.toUpperCase());
+        return new LockUnlockResponse(user.getUsername().toLowerCase(), "unlocked");
     }
 
-    private String convertSalaryInDollarsAndCents(Long salary) {
+    public void increaseFailedAttempts(User user) {
+        int newFailedAttempts = user.getFailedAttempt() + 1;
+        user.setFailedAttempt(newFailedAttempts);
+        userRepository.save(user);
+    }
 
-        long dollars = (salary > 0 & salary < 100) ? 0 : salary / 100;
-        long cents = dollars > 0 ? salary % 100 : salary;
-
-        return dollars + " dollar(s) " + cents + " cent(s)";
+    public void resetFailedAttempts(User user) {
+        user.setFailedAttempt(0);
+        userRepository.save(user);
     }
 }

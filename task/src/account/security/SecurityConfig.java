@@ -1,7 +1,7 @@
 package account.security;
 
-import account.model.Role;
 import account.service.JpaUserDetailsService;
+import account.service.LoggingService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,11 +21,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JpaUserDetailsService userDetailsService;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final LoggingService loggingService;
 
     public SecurityConfig(JpaUserDetailsService userDetailsService,
-                          RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
+                          RestAuthenticationEntryPoint restAuthenticationEntryPoint, LoggingService loggingService) {
         this.userDetailsService = userDetailsService;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.loggingService = loggingService;
     }
 
     @Bean
@@ -50,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/api/security/events/**").hasAnyAuthority("ROLE_AUDITOR")
                 .antMatchers(HttpMethod.POST, "/api/auth/changepass/**").hasAnyAuthority("ROLE_USER", "ROLE_ACCOUNTANT", "ROLE_ADMINISTRATOR")
                 .antMatchers(HttpMethod.GET, "/api/empl/payment/**").hasAnyAuthority("ROLE_USER", "ROLE_ACCOUNTANT")
                 .antMatchers(HttpMethod.POST, "/api/acct/payments/**").hasAuthority("ROLE_ACCOUNTANT")
@@ -72,6 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        return new CustomAccessDeniedHandler();
+        return new CustomAccessDeniedHandler(loggingService);
     }
 }

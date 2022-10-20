@@ -3,7 +3,6 @@ package account.model;
 import account.web.requests.UserRequest;
 
 import javax.persistence.*;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +26,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<Group> userGroups = new HashSet<>();
+
+    @Column(name = "account_is_locked", columnDefinition = "boolean default false")
+    private boolean isLocked = false;
+
+    @Column(name = "failed_attempt", columnDefinition = "integer default 0")
+    private int failedAttempt = 0;
 
     public User() {
     }
@@ -97,6 +102,22 @@ public class User {
         this.userGroups = userGroups;
     }
 
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    public int getFailedAttempt() {
+        return failedAttempt;
+    }
+
+    public void setFailedAttempt(int failedAttempt) {
+        this.failedAttempt = failedAttempt;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -105,7 +126,8 @@ public class User {
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
-                ", roles='" + userGroups + '\'' +
+                ", isLocked=" + isLocked +
+                ", failedAttempt=" + failedAttempt +
                 '}';
     }
 }
