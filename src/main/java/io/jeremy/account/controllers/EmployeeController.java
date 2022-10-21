@@ -17,11 +17,9 @@ import java.util.regex.Pattern;
 @RequestMapping("/api/empl")
 public class EmployeeController {
 
-    private final UserService userService;
     private final PaymentService paymentService;
 
-    public EmployeeController(UserService userService, PaymentService paymentService) {
-        this.userService = userService;
+    public EmployeeController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
@@ -34,7 +32,6 @@ public class EmployeeController {
         }
 
         String name = principal.getName();
-        System.out.println("period: " + period);
         if (period != null) {
             return ResponseEntity.ok(paymentService.getUserPaymentForPeriod(name, period));
         }
