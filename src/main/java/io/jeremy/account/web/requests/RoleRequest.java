@@ -7,9 +7,10 @@ public class RoleRequest {
 
     @NotBlank
     private String user;
+    @NotBlank
     private String role;
 
-    @Pattern(regexp = "GRANT|REMOVE")
+    @NotBlank
     private Operation operation;
 
     public enum Operation {

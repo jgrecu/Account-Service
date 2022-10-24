@@ -31,5 +31,4 @@ public class AccountantController {
         paymentService.updatePayment(payment);
         return new PaymentsResponse("Updated successfully!");
     }
-
 }

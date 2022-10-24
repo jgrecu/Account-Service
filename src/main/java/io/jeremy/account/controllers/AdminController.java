@@ -1,6 +1,5 @@
 package io.jeremy.account.controllers;
 
-import io.jeremy.account.model.SecurityUser;
 import io.jeremy.account.service.UserService;
 import io.jeremy.account.web.requests.LockUnlockRequest;
 import io.jeremy.account.web.requests.RoleRequest;
@@ -8,7 +7,6 @@ import io.jeremy.account.web.responses.DeleteUserResponse;
 import io.jeremy.account.web.responses.LockUnlockResponse;
 import io.jeremy.account.web.responses.UserResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,36 +31,37 @@ public class AdminController {
 
     @DeleteMapping("/user/{userEmail}")
     public DeleteUserResponse deleteUser(@PathVariable String userEmail) {
-        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.deleteUser(userEmail, admin);
+        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.deleteUser(userEmail, loggedUser);
     }
 
     @PutMapping("/user/role")
-    public UserResponse grantRole(@RequestBody RoleRequest roleRequest) {
-        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
+    public UserResponse grantRole(@RequestBody @Valid RoleRequest roleRequest) {
+        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
         var operation = roleRequest.getOperation().name();
 
         if (operation.equals("GRANT")) {
-            return userService.grantRoles(roleRequest.getUser(), roleRequest.getRole(), admin);
+            return userService.grantRoles(roleRequest.getUser(), roleRequest.getRole(), loggedUser);
         }
 
         if (operation.equals("REMOVE")) {
-            return userService.removeRole(roleRequest.getUser(), roleRequest.getRole(), admin);
+            return userService.removeRole(roleRequest.getUser(), roleRequest.getRole(), loggedUser);
         }
+
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be only GRANT or REMOVE!");
     }
 
     @PutMapping("/user/access")
     public LockUnlockResponse lockUnlockUser(@RequestBody @Valid LockUnlockRequest request) {
-        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
+        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
         var operation = request.getOperation().name();
 
         if (operation.equals("LOCK")) {
-            return userService.lockUser(request.getUser(), admin);
+            return userService.lockUser(request.getUser(), loggedUser);
         }
 
         if (operation.equals("UNLOCK")) {
-            return userService.unlockUser(request.getUser(),admin);
+            return userService.unlockUser(request.getUser(), loggedUser);
         }
 
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be only LOCK or UNLOCK!");

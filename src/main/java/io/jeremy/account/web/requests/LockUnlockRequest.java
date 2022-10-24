@@ -8,7 +8,7 @@ public class LockUnlockRequest {
     @NotBlank
     private String user;
 
-    //@Pattern(regexp = "LOCK|UNLOCK")
+    @NotBlank
     private LockOperation operation;
 
 
