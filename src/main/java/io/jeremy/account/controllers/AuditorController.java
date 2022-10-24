@@ -23,7 +23,10 @@ public class AuditorController {
     @GetMapping("/events")
     public ResponseEntity<List<LogEntry>> getLogs() {
         List<LogEntry> logEntries = loggingService.getAllEntries();
-        if (logEntries.isEmpty()) return ResponseEntity.ok(Collections.EMPTY_LIST);
-        else return ResponseEntity.ok(logEntries);
+        if (logEntries.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        } else {
+            return ResponseEntity.ok(logEntries);
+        }
     }
 }

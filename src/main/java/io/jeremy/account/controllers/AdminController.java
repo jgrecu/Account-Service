@@ -9,6 +9,7 @@ import io.jeremy.account.web.responses.LockUnlockResponse;
 import io.jeremy.account.web.responses.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,12 +32,14 @@ public class AdminController {
     }
 
     @DeleteMapping("/user/{userEmail}")
-    public DeleteUserResponse deleteUser(@PathVariable String userEmail, @AuthenticationPrincipal SecurityUser admin) {
+    public DeleteUserResponse deleteUser(@PathVariable String userEmail) {
+        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
         return userService.deleteUser(userEmail, admin);
     }
 
     @PutMapping("/user/role")
-    public UserResponse grantRole(@RequestBody RoleRequest roleRequest, @AuthenticationPrincipal SecurityUser admin) {
+    public UserResponse grantRole(@RequestBody RoleRequest roleRequest) {
+        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
         var operation = roleRequest.getOperation().name();
 
         if (operation.equals("GRANT")) {
@@ -50,8 +53,8 @@ public class AdminController {
     }
 
     @PutMapping("/user/access")
-    public LockUnlockResponse lockUnlockUser(@RequestBody @Valid LockUnlockRequest request,
-                                             @AuthenticationPrincipal SecurityUser admin) {
+    public LockUnlockResponse lockUnlockUser(@RequestBody @Valid LockUnlockRequest request) {
+        var admin = SecurityContextHolder.getContext().getAuthentication().getName();
         var operation = request.getOperation().name();
 
         if (operation.equals("LOCK")) {

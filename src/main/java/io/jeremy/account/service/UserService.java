@@ -142,7 +142,7 @@ public class UserService {
         return new ChangePassResponse(userName.toLowerCase(), "The password has been updated successfully");
     }
 
-    public DeleteUserResponse deleteUser(String email, SecurityUser admin) {
+    public DeleteUserResponse deleteUser(String email, String admin) {
         User userToDelete = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -161,7 +161,7 @@ public class UserService {
 
         loggingService.saveEntry(new LogEntry(
                 "DELETE_USER",
-                admin.getUsername().toLowerCase(),
+                admin.toLowerCase(),
                 email.toLowerCase(),
                 "api/admin/user"
         ));
@@ -169,7 +169,7 @@ public class UserService {
         return userResponse;
     }
 
-    public UserResponse grantRoles(String email, String role, SecurityUser admin) {
+    public UserResponse grantRoles(String email, String role, String admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -195,7 +195,7 @@ public class UserService {
 
         loggingService.saveEntry(new LogEntry(
                 "GRANT_ROLE",
-                admin.getUsername().toLowerCase(),
+                admin.toLowerCase(),
                 String.format("Grant role %s to %s", role, email.toLowerCase()),
                 "api/admin/user/role"
 
@@ -203,7 +203,7 @@ public class UserService {
         return new UserResponse(savedUser);
     }
 
-    public UserResponse removeRole(String email, String role, SecurityUser admin) {
+    public UserResponse removeRole(String email, String role, String admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
 
@@ -229,7 +229,7 @@ public class UserService {
 
         loggingService.saveEntry(new LogEntry(
                 "REMOVE_ROLE",
-                admin.getUsername().toLowerCase(),
+                admin.toLowerCase(),
                 String.format("Remove role %s from %s", role, email.toLowerCase()),
                 "api/admin/user/role"
 
@@ -238,7 +238,7 @@ public class UserService {
         return new UserResponse(savedUser);
     }
 
-    public LockUnlockResponse lockUser(String email, SecurityUser admin) {
+    public LockUnlockResponse lockUser(String email, String admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
         if (user.hasGroup("ROLE_ADMINISTRATOR")) {
@@ -249,7 +249,7 @@ public class UserService {
 
         loggingService.saveEntry(new LogEntry(
                 "LOCK_USER",
-                admin.getUsername().toLowerCase(),
+                admin.toLowerCase(),
                 String.format("Lock user %s", email.toLowerCase()),
                 "api/admin/user/access"
 
@@ -267,7 +267,7 @@ public class UserService {
         user.setLocked(true);
         userRepository.save(user);
     }
-    public LockUnlockResponse unlockUser(String email, SecurityUser admin) {
+    public LockUnlockResponse unlockUser(String email, String admin) {
         User user = userRepository.findByUsernameIgnoreCase(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
         user.setLocked(false);
@@ -275,7 +275,7 @@ public class UserService {
 
         loggingService.saveEntry(new LogEntry(
                 "UNLOCK_USER",
-                admin.getUsername().toLowerCase(),
+                admin.toLowerCase(),
                 String.format("Unlock user %s", email.toLowerCase()),
                 "api/admin/user/access"
         ));
