@@ -9,13 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class GroupDataLoader {
 
-    private final GroupRepository repository;
-
-    public GroupDataLoader(GroupRepository repository) {
-        this.repository = repository;
-    }
-
-
     @Bean
     public CommandLineRunner commandLineRunner(GroupRepository repository) {
         return args -> {
