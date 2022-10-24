@@ -2,6 +2,7 @@ package io.jeremy.account.controllers;
 
 import io.jeremy.account.service.PaymentService;
 import io.jeremy.account.web.responses.UserPaymentsResponse;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,16 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@WebMvcTest(EmployeeController.class)
 class EmployeeControllerTest {
 
     @Autowired
-    private WebApplicationContext context;
+    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private PaymentService paymentService;
@@ -34,32 +38,39 @@ class EmployeeControllerTest {
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
+                .webAppContextSetup(this.webApplicationContext)
                 .apply(springSecurity())
                 .build();
     }
 
     @Test
-    @WithMockUser("john@acme.com")
-    void whenGivenTheRightUser() throws Exception {
+    @WithMockUser(username = "john@acme.com")
+    void shouldReturnAListOfPaymentsIfRoleIsUSER() throws Exception {
         when(paymentService.getUserPayments("john@acme.com"))
                 .thenReturn(List.of(new UserPaymentsResponse("John", "Doe",
-                        "January-2022", "1")));
+                        "January-2022", "1000 dollar(s) and 0 cent(s)")));
 
         mockMvc.perform(get("/api/empl/payment").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", Matchers.is(1)))
+                .andExpect(jsonPath("$[0].name").value("John"))
+                .andExpect(jsonPath("$[0].lastname").value("Doe"))
+                .andExpect(jsonPath("$[0].salary").value("1000 dollar(s) and 0 cent(s)"))
+                .andDo(print());
     }
 
     @Test
     @WithMockUser(roles = "ADMINISTRATOR")
-    void name() throws Exception {
+    void shouldReturnForbiddenIfRoleIsNotUSER() throws Exception {
         mockMvc.perform(get("/api/empl/payment").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andDo(print());
     }
 
     @Test
-    void name_unauthenticated() throws Exception {
+    void shouldReturnUnauthorizedIfNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/empl/payment").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 }

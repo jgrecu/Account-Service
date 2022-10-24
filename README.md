@@ -15,6 +15,10 @@ It's time to plan the architecture of our service. A good plan is 50% of the res
 1. PUT api/admin/user/role changes user roles;
 2. DELETE api/admin/user deletes a user;
 3. GET api/admin/user displays information about all users.
+4. PUT api/admin/user/access locks / unlocks user
+
+- Security Auditor
+1. GET api/security/events gets all the events
 
 
 To ensure the security of our service, we will also plan the distribution of roles:
