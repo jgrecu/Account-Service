@@ -1,6 +1,5 @@
 package io.jeremy.account.service;
 
-import io.jeremy.account.exceptions.EmployeeNotFoundException;
 import io.jeremy.account.model.Payment;
 import io.jeremy.account.model.User;
 import io.jeremy.account.respository.PaymentRepository;
@@ -42,14 +41,15 @@ public class PaymentService {
 
             userRepository.findByUsernameIgnoreCase(paymentRequest.getEmployee())
                     .orElseThrow(() ->
-                            new EmployeeNotFoundException("User \"" + paymentRequest.getEmployee() + "\" not found!"));
+                            new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                    "User \"" + paymentRequest.getEmployee() + "\" not found!"));
 
             Optional<Payment> optionalPayment = paymentRepository.
                     findByEmployeeAndPeriod(paymentRequest.getEmployee().toLowerCase(), date);
 
             if (optionalPayment.isPresent()) {
-                throw new EmployeeNotFoundException("User \"" + paymentRequest.getEmployee() + "\" and period \""
-                        + date + "\" already exists!");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "User \"" + paymentRequest.getEmployee() + "\" and period \"" + date + "\" already exists!");
             }
 
             paymentRepository.saveAndFlush(payment);
@@ -64,7 +64,8 @@ public class PaymentService {
 
         userRepository.findByUsernameIgnoreCase(paymentRequest.getEmployee())
                 .orElseThrow(() ->
-                        new EmployeeNotFoundException("User \"" + paymentRequest.getEmployee() + "\" not found!"));
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "User \"" + paymentRequest.getEmployee() + "\" not found!"));
 
         payment.setEmployee(paymentRequest.getEmployee());
         LocalDate date = convertPeriodStringToLocalDate(paymentRequest.getPeriod());
@@ -113,7 +114,7 @@ public class PaymentService {
         return paymentOptional.map(payment -> new UserPaymentsResponse(name, lastName,
                         convertLocalDateToNicePeriodString(payment.getPeriod()),
                         convertSalaryInDollarsAndCents(payment.getSalary())))
-                .orElseThrow(() -> new EmployeeNotFoundException("Payment not found for the period"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment not found for the period"));
     }
 
     private String convertLocalDateToNicePeriodString(LocalDate date) {
