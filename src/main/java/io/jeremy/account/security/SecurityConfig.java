@@ -42,11 +42,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic(basic -> basic.authenticationEntryPoint(restAuthenticationEntryPoint))
-                .csrf().disable().headers().frameOptions().disable()
-                .and()
+        http
+                .httpBasic(basic -> basic.authenticationEntryPoint(restAuthenticationEntryPoint))
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions().disable())
                 .exceptionHandling(exh -> exh.accessDeniedHandler(accessDeniedHandler()))
-                .authorizeRequests(auth -> auth
+                .authorizeRequests(authz -> authz
                         .mvcMatchers("/h2-console/**").permitAll()
                         .mvcMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
                         .mvcMatchers(HttpMethod.POST, "/api/auth/changepass").authenticated()
