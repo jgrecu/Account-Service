@@ -1,19 +1,29 @@
-package io.jeremy.account.web.requests;
+package io.jeremy.account.dto.requests;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.jeremy.account.validation.ValidEmail;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class UserRequest {
 
+    @NotNull
     @NotBlank
     private String name;
+
+    @NotNull
     @NotBlank
     private String lastname;
+
+    @ValidEmail
+    @NotNull
     @NotBlank
     private String email;
+
+    @NotNull
     @NotBlank
     private String password;
 

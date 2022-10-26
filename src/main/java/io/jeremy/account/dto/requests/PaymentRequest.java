@@ -1,4 +1,4 @@
-package io.jeremy.account.web.requests;
+package io.jeremy.account.dto.requests;
 
 import javax.validation.constraints.*;
 

@@ -1,4 +1,4 @@
-package io.jeremy.account.web.responses;
+package io.jeremy.account.dto.responses;
 
 import io.jeremy.account.model.Group;
 import io.jeremy.account.model.User;

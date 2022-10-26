@@ -1,7 +1,6 @@
-package io.jeremy.account.web.requests;
+package io.jeremy.account.dto.requests;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 public class RoleRequest {
 

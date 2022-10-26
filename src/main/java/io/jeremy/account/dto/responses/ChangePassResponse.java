@@ -1,4 +1,4 @@
-package io.jeremy.account.web.responses;
+package io.jeremy.account.dto.responses;
 
 public class ChangePassResponse {
     private String email;
