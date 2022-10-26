@@ -1,8 +1,8 @@
 package io.jeremy.account.controllers;
 
 import io.jeremy.account.service.PaymentService;
-import io.jeremy.account.web.requests.PaymentRequest;
-import io.jeremy.account.web.responses.PaymentsResponse;
+import io.jeremy.account.dto.requests.PaymentRequest;
+import io.jeremy.account.dto.responses.PaymentsResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

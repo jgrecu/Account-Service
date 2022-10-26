@@ -1,7 +1,7 @@
 package io.jeremy.account.controllers;
 
 import io.jeremy.account.service.PaymentService;
-import io.jeremy.account.web.responses.UserPaymentsResponse;
+import io.jeremy.account.dto.responses.UserPaymentsResponse;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

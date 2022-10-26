@@ -1,6 +1,6 @@
 package io.jeremy.account.model;
 
-import io.jeremy.account.web.requests.UserRequest;
+import io.jeremy.account.dto.requests.UserRequest;
 
 import javax.persistence.*;
 import java.util.HashSet;

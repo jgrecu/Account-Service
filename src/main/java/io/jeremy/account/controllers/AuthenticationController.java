@@ -1,9 +1,9 @@
 package io.jeremy.account.controllers;
 
-import io.jeremy.account.web.requests.ChangePasswordRequest;
-import io.jeremy.account.web.requests.UserRequest;
-import io.jeremy.account.web.responses.ChangePassResponse;
-import io.jeremy.account.web.responses.UserResponse;
+import io.jeremy.account.dto.requests.ChangePasswordRequest;
+import io.jeremy.account.dto.requests.UserRequest;
+import io.jeremy.account.dto.responses.ChangePassResponse;
+import io.jeremy.account.dto.responses.UserResponse;
 import io.jeremy.account.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
