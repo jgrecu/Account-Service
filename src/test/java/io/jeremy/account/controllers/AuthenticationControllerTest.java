@@ -1,5 +1,7 @@
 package io.jeremy.account.controllers;
 
+import io.jeremy.account.service.JpaUserDetailsService;
+import io.jeremy.account.service.LoggingService;
 import io.jeremy.account.service.UserService;
 import io.jeremy.account.dto.requests.UserRequest;
 import io.jeremy.account.dto.responses.ChangePassResponse;
@@ -7,7 +9,9 @@ import io.jeremy.account.dto.responses.UserResponse;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,33 +32,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WebMvcTest(AuthenticationController.class)
 class AuthenticationControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
 
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(this.webApplicationContext)
-                .apply(springSecurity())
-                .build();
-    }
+    @MockBean
+    private JpaUserDetailsService jpaUserDetailsService;
+
+    @MockBean
+    private LoggingService loggingService;
+
+//    @BeforeEach
+//    public void setup() {
+//        mockMvc = MockMvcBuilders
+//                .webAppContextSetup(this.webApplicationContext)
+//                .apply(springSecurity())
+//                .build();
+//    }
 
     @Test
     void shouldCreateANewUSer() throws Exception {
-        String userRequest = "{\n" +
-                "    \"name\": \"John\",\n" +
-                "    \"lastname\": \"Doe\",\n" +
-                "    \"email\": \"johndoe@acme.com\",\n" +
-                "    \"password\": \"bZPGqH7fTJWW\"\n" +
-                "}";
+        String userRequest = """
+                {
+                    "name": "John",
+                    "lastname": "Doe",
+                    "email": "johndoe@acme.com",
+                    "password": "bZPGqH7fTJWW"
+                }""";
+
         UserResponse userResponse = new UserResponse(1L, "John", "Doe",
                 "johndoe@acme.com", List.of("ROLE_USER"));
         when(userService.addUser(any(UserRequest.class))).thenReturn(userResponse);
