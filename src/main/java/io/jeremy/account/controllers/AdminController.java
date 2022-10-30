@@ -7,6 +7,7 @@ import io.jeremy.account.dto.responses.DeleteUserResponse;
 import io.jeremy.account.dto.responses.LockUnlockResponse;
 import io.jeremy.account.dto.responses.UserResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,14 +31,14 @@ public class AdminController {
     }
 
     @DeleteMapping("/user/{userEmail}")
-    public DeleteUserResponse deleteUser(@PathVariable String userEmail) {
-        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    public DeleteUserResponse deleteUser(@PathVariable String userEmail, Authentication authentication) {
+        var loggedUser = authentication.getName();
         return userService.deleteUser(userEmail, loggedUser);
     }
 
     @PutMapping("/user/role")
-    public UserResponse grantRole(@RequestBody @Valid RoleRequest roleRequest) {
-        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    public UserResponse grantRole(@RequestBody @Valid RoleRequest roleRequest, Authentication authentication) {
+        var loggedUser = authentication.getName();
         var operation = roleRequest.getOperation().name();
 
         if (operation.equals("GRANT")) {
@@ -48,12 +49,12 @@ public class AdminController {
             return userService.removeRole(roleRequest.getUser(), roleRequest.getRole(), loggedUser);
         }
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be only GRANT or REMOVE!");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be either GRANT or REMOVE!");
     }
 
     @PutMapping("/user/access")
-    public LockUnlockResponse lockUnlockUser(@RequestBody @Valid LockUnlockRequest request) {
-        var loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    public LockUnlockResponse lockUnlockUser(@RequestBody @Valid LockUnlockRequest request, Authentication authentication) {
+        var loggedUser = authentication.getName();
         var operation = request.getOperation().name();
 
         if (operation.equals("LOCK")) {
@@ -64,6 +65,6 @@ public class AdminController {
             return userService.unlockUser(request.getUser(), loggedUser);
         }
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be only LOCK or UNLOCK!");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operation must be either LOCK or UNLOCK!");
     }
 }
