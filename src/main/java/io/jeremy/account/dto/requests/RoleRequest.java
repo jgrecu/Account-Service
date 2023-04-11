@@ -5,41 +5,33 @@ import javax.validation.constraints.NotBlank;
 public class RoleRequest {
 
     @NotBlank
-    private String user;
+    private final String user;
     @NotBlank
-    private String role;
+    private final String role;
 
     @NotBlank
-    private Operation operation;
+    private final Operation operation;
+
+    public RoleRequest(String user, String role, Operation operation) {
+        this.user = user;
+        this.role = role;
+        this.operation = operation;
+    }
 
     public enum Operation {
         GRANT, REMOVE
-    }
-
-    public RoleRequest() {
     }
 
     public String getUser() {
         return user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
-
     public String getRole() {
         return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public Operation getOperation() {
         return operation;
     }
 
-    public void setOperation(Operation operation) {
-        this.operation = operation;
-    }
 }

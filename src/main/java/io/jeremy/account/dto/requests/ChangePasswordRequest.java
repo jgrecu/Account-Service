@@ -11,16 +11,13 @@ public class ChangePasswordRequest {
     @NotNull
     @NotBlank
     @Size(min = 12, message = "Password length must be 12 chars minimum!")
-    private String newPassword;
+    private final String newPassword;
 
-    public ChangePasswordRequest() {
+    public ChangePasswordRequest(final String newPassword) {
+        this.newPassword = newPassword;
     }
 
     public String getNewPassword() {
         return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
     }
 }

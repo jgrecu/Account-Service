@@ -1,7 +1,5 @@
 package io.jeremy.account.dto.requests;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jeremy.account.validation.ValidEmail;
 
 import javax.validation.constraints.NotBlank;
@@ -12,37 +10,35 @@ public class UserRequest {
 
     @NotNull
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotNull
     @NotBlank
-    private String lastname;
+    private final String lastname;
 
     @ValidEmail
     @NotNull
     @NotBlank
-    private String email;
+    private final String email;
 
     @NotNull
     @NotBlank
-    private String password;
+    private final String password;
 
     private List<String> roles;
 
-    public UserRequest() {
-    }
-
-    public UserRequest(String name, String lastname, String email, String password) {
+    public UserRequest(final String name, final String lastname, final String email, final String password) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
     }
 
-    public UserRequest(String name, String lastname, String email, List<String> roles) {
+    public UserRequest(final String name, final String lastname, final String email, final String password, List<String> roles) {
         this.name = name;
         this.lastname = lastname;
         this.email = email;
+        this.password = password;
         this.roles = roles;
     }
 
@@ -50,34 +46,16 @@ public class UserRequest {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getLastname() {
         return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @JsonIgnore
-    @JsonProperty(value = "password")
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override
