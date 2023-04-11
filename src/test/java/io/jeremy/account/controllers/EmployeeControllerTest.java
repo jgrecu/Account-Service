@@ -1,51 +1,49 @@
 package io.jeremy.account.controllers;
 
-import io.jeremy.account.service.PaymentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jeremy.account.dto.responses.UserPaymentsResponse;
+import io.jeremy.account.service.JpaUserDetailsService;
+import io.jeremy.account.service.LoggingService;
+import io.jeremy.account.service.PaymentService;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@WebMvcTest(EmployeeController.class)
+@WebMvcTest(EmployeeController.class)
 class EmployeeControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @MockBean
     private PaymentService paymentService;
 
-    private MockMvc mockMvc;
+    @MockBean
+    private JpaUserDetailsService jpaUserDetailsService;
 
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(this.webApplicationContext)
-                .apply(springSecurity())
-                .build();
-    }
+    @MockBean
+    private LoggingService loggingService;
 
     @Test
     @WithMockUser(username = "john@acme.com")
     void shouldReturnAListOfPaymentsIfRoleIsUSER() throws Exception {
+
         when(paymentService.getUserPayments("john@acme.com"))
                 .thenReturn(List.of(new UserPaymentsResponse("John", "Doe",
                         "January-2022", "1000 dollar(s) and 0 cent(s)")));
@@ -57,6 +55,8 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$[0].lastname").value("Doe"))
                 .andExpect(jsonPath("$[0].salary").value("1000 dollar(s) and 0 cent(s)"))
                 .andDo(print());
+
+        verify(paymentService, times(1)).getUserPayments(anyString());
     }
 
     @Test
