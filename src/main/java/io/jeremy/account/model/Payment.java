@@ -17,6 +17,13 @@ public class Payment {
     public Payment() {
     }
 
+    public Payment(Long id, String employee, LocalDate period, Long salary) {
+        this.id = id;
+        this.employee = employee;
+        this.period = period;
+        this.salary = salary;
+    }
+
     public Long getId() {
         return id;
     }
