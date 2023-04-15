@@ -34,6 +34,6 @@ build/
 
 ### VS Code ###
 .vscode/
-
+*.h2.db
 .DS_Store
 
