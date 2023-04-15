@@ -9,13 +9,13 @@ import io.jeremy.account.respository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class PaymentServiceTest {
 
@@ -31,15 +31,20 @@ class PaymentServiceTest {
     }
 
     @Test
-    void getUserPayments() {
+    void getUserPaymentsForValidUser() {
         UserRequest userRequest = new UserRequest("Jeremy", "Grecu",
                 "jeremy@example.com", "pass");
         User user = new User(userRequest, "pass");
+        Payment payment = new Payment(1L, "jeremy@example.com",
+                LocalDate.of(2023, 1, 1), 20_000L);
+
         when(userRepository.findByUsernameIgnoreCase("jeremy")).thenReturn(Optional.of(user));
-        when(paymentRepository.findByEmployeeOrderByPeriodDesc(any())).thenReturn(List.of(new Payment()));
+        when(paymentRepository.findByEmployeeOrderByPeriodDesc(any())).thenReturn(List.of(payment));
 
         List<UserPaymentsResponse> userPayments = paymentService.getUserPayments("jeremy");
-        assertThat(userPayments.get(1).getName()).isEqualTo("Jeremy");
+        assertThat(userPayments.get(0).getName()).isEqualTo("Jeremy");
 
+        verify(userRepository, times(1)).findByUsernameIgnoreCase(any(String.class));
+        verify(paymentRepository, times(1)).findByEmployeeOrderByPeriodDesc(any());
     }
 }
