@@ -5,27 +5,32 @@ import javax.validation.constraints.NotBlank;
 public class LockUnlockRequest {
 
     @NotBlank
-    private final String user;
+    private String user;
 
     @NotBlank
-    private final LockOperation operation;
+    private LockOperation operation;
 
 
     public enum LockOperation {
         LOCK, UNLOCK
     }
 
-    public LockUnlockRequest(String user, LockOperation operation) {
-        this.user = user;
-        this.operation = operation;
+    public LockUnlockRequest() {
     }
 
     public String getUser() {
         return user;
     }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     public LockOperation getOperation() {
         return operation;
     }
 
+    public void setOperation(LockOperation operation) {
+        this.operation = operation;
+    }
 }
