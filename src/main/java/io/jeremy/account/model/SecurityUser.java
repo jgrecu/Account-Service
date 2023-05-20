@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 
 public class SecurityUser implements UserDetails {
 
-    private User user;
+    private static final long serialVersionUID = 1;
+
+    private final User user;
 
     public SecurityUser(User user) {
         this.user = user;

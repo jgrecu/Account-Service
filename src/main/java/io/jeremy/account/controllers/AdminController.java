@@ -41,11 +41,11 @@ public class AdminController {
         var loggedUser = authentication.getName();
         var operation = roleRequest.getOperation().name();
 
-        if (operation.equals("GRANT")) {
+        if ("GRANT".equals(operation)) {
             return userService.grantRoles(roleRequest.getUser(), roleRequest.getRole(), loggedUser);
         }
 
-        if (operation.equals("REMOVE")) {
+        if ("REMOVE".equals(operation)) {
             return userService.removeRole(roleRequest.getUser(), roleRequest.getRole(), loggedUser);
         }
 
@@ -57,11 +57,11 @@ public class AdminController {
         var loggedUser = authentication.getName();
         var operation = request.getOperation().name();
 
-        if (operation.equals("LOCK")) {
+        if ("LOCK".equals(operation)) {
             return userService.lockUser(request.getUser(), loggedUser);
         }
 
-        if (operation.equals("UNLOCK")) {
+        if ("UNLOCK".equals(operation)) {
             return userService.unlockUser(request.getUser(), loggedUser);
         }
 

@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .httpBasic(basic -> basic.authenticationEntryPoint(restAuthenticationEntryPoint()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions().disable())
                 .exceptionHandling(exh -> exh.accessDeniedHandler(accessDeniedHandler()))
                 .authorizeRequests(authz -> authz

@@ -30,12 +30,12 @@ public class Group {
         this.name = name;
         users = new HashSet<>();
 
-        if (name.equals("ROLE_ADMINISTRATOR")) {
+        if ("ROLE_ADMINISTRATOR".equals(name)) {
             isBusiness = false;
             isAdministrative = true;
         }
 
-        if (name.equals("ROLE_USER") || name.equals("ROLE_ACCOUNTANT") || name.equals("ROLE_AUDITOR")) {
+        if ("ROLE_USER".equals(name) || "ROLE_ACCOUNTANT".equals(name) || "ROLE_AUDITOR".equals(name)) {
             isBusiness = true;
             isAdministrative = false;
         }

@@ -215,7 +215,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user does not have a role!");
         }
 
-        if (groupToDelete.getName().equals("ROLE_ADMINISTRATOR")) {
+        if ("ROLE_ADMINISTRATOR".equals(groupToDelete.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
         }
 

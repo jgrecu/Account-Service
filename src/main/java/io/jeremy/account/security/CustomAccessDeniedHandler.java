@@ -22,7 +22,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                        AccessDeniedException accessDeniedException) throws IOException {
 
         String user = request.getRemoteUser();
-        if (user == null) user = "Anonymous";
+        if (user == null) {
+            user = "Anonymous";
+        }
 
         loggingService.saveEntry(new LogEntry(
                 "ACCESS_DENIED",

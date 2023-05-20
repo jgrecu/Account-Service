@@ -28,10 +28,10 @@ public class User {
     private Set<Group> userGroups = new HashSet<>();
 
     @Column(name = "account_is_locked", columnDefinition = "boolean default false")
-    private boolean isLocked = false;
+    private boolean isLocked;
 
     @Column(name = "failed_attempt", columnDefinition = "integer default 0")
-    private int failedAttempt = 0;
+    private int failedAttempt;
 
     public User() {
     }
