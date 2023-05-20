@@ -54,7 +54,7 @@ public class CustomLoginFailureListener implements ApplicationListener<Authentic
                         loggingService.saveEntry(new LogEntry(
                                 "LOCK_USER",
                                 email.toLowerCase(),
-                                String.format("Lock user %s", email.toLowerCase()),
+                                "Lock user %s".formatted(email.toLowerCase()),
                                 request.getRequestURI()
                         ));
                     }

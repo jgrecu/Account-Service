@@ -7,7 +7,7 @@ public class LockUnlockResponse {
     }
 
     public LockUnlockResponse(String user, String status) {
-        this.status = String.format("User %s %s!", user, status);
+        this.status = "User %s %s!".formatted(user, status);
     }
 
     public String getStatus() {

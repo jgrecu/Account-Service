@@ -195,7 +195,7 @@ public class UserService {
         loggingService.saveEntry(new LogEntry(
                 "GRANT_ROLE",
                 admin.toLowerCase(),
-                String.format("Grant role %s to %s", role, email.toLowerCase()),
+                "Grant role %s to %s".formatted(role, email.toLowerCase()),
                 "api/admin/user/role"
 
         ));
@@ -229,7 +229,7 @@ public class UserService {
         loggingService.saveEntry(new LogEntry(
                 "REMOVE_ROLE",
                 admin.toLowerCase(),
-                String.format("Remove role %s from %s", role, email.toLowerCase()),
+                "Remove role %s from %s".formatted(role, email.toLowerCase()),
                 "api/admin/user/role"
 
         ));
@@ -249,7 +249,7 @@ public class UserService {
         loggingService.saveEntry(new LogEntry(
                 "LOCK_USER",
                 admin.toLowerCase(),
-                String.format("Lock user %s", email.toLowerCase()),
+                "Lock user %s".formatted(email.toLowerCase()),
                 "api/admin/user/access"
 
         ));
@@ -275,7 +275,7 @@ public class UserService {
         loggingService.saveEntry(new LogEntry(
                 "UNLOCK_USER",
                 admin.toLowerCase(),
-                String.format("Unlock user %s", email.toLowerCase()),
+                "Unlock user %s".formatted(email.toLowerCase()),
                 "api/admin/user/access"
         ));
 
