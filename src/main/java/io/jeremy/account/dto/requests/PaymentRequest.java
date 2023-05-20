@@ -43,10 +43,10 @@ public class PaymentRequest {
 
     @Override
     public String toString() {
-        return "PaymentRequest{" +
-                "employee='" + employee + '\'' +
-                ", period='" + period + '\'' +
-                ", salary=" + salary +
-                '}';
+        return "PaymentRequest{"
+                + "employee='" + employee + '\''
+                + ", period='" + period + '\''
+                + ", salary=" + salary
+                + '}';
     }
 }

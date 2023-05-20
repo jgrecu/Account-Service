@@ -72,12 +72,12 @@ public class UserResponse {
 
     @Override
     public String toString() {
-        return "UserResponse{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", email='" + email + '\'' +
-                ", roles=" + roles +
-                '}';
+        return "UserResponse{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", lastname='" + lastname + '\''
+                + ", email='" + email + '\''
+                + ", roles=" + roles
+                + '}';
     }
 }
